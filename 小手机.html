@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 聊天小手机</title>
+    <style>
+        /* CSS 样式部分 */
+        
+        /* 1. 手机外壳和居中 */
+        body {
+            display: flex;
+            justify-content: center; /* 水平居中 */
+            align-items: center;   /* 垂直居中 */
+            min-height: 100vh;     /* 确保占满视口高度 */
+            margin: 0;
+            background-color: #e0e0e0; /* 网页背景色 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* 2. 模拟手机屏幕 */
+        .phone-screen {
+            width: 360px; /* 屏幕宽度 */
+            height: 640px; /* 屏幕高度 */
+            background-color: #f8f8f8;
+            border: 10px solid #333; /* 手机边框 */
+            border-radius: 40px; /* 手机圆角 */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden; /* 隐藏超出屏幕的内容 */
+        }
+
+        /* 3. 顶部状态栏 */
+        .status-bar {
+            padding: 5px 15px;
+            background-color: #f8f8f8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* 4. APP 网格区域 (主界面) */
+        .app-grid {
+            padding: 20px 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 每行4个图标 */
+            gap: 20px 0px; /* 行间距和列间距 */
+            text-align: center;
+        }
+
+        /* 5. 单个 APP 图标 */
+        .app-icon {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        .app-icon-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background-color: #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s;
+        }
+
+        .app-icon:active .app-icon-img {
+            transform: scale(0.95);
+        }
+
+        .app-icon-label {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #333;
+            max-width: 70px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        /* --- APP 通用样式 --- */
+        .chat-app, .api-app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f0f0;
+            display: flex; 
+            flex-direction: column;
+        }
+
+        /* 头部样式 (聊天和API通用) */
+        .chat-header, .api-header {
+            padding: 10px 15px;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            color: #2196f3;
+        }
+
+
+        /* 6. 聊天 APP 样式 */
+        .chat-messages {
+            flex-grow: 1; 
+            padding: 10px;
+            overflow-y: auto; 
+        }
+
+        .message {
+            max-width: 75%;
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 18px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.received {
+            background-color: #ffffff;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.sent {
+            background-color: #2196f3;
+            color: #fff;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+        }
+        #chatInput {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+        #sendBtn {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+
+        /* 7. API APP 样式 */
+        .api-config-area {
+            padding: 20px;
+        }
+
+        .api-config-area h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .api-config-area label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 5px;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .api-config-area input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .save-btn {
+            width: 100%;
+            margin-top: 25px;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .save-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .api-status {
+            padding: 0 20px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        /* 8. 模型选择样式 */
+        .api-config-area select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: #fff;
+            appearance: none; /* 移除默认下拉箭头 */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.7c-5.9%200-11.3%203.2-13.2%208.6-1.9%205.4-.5%2011.6%204.3%2016.3l128%20128c4.8%204.8%2011%206.8%2016.3%206.8s11.5-2%2016.3-6.8l128-128c4.8-4.7%206.2-10.9%204.3-16.3z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-screen" id="phoneScreen">
+        
+        <div class="status-bar">
+            <span>01:56:00 AM</span> <span>📶 LTE 🔋</span>
+        </div>
+
+        <div class="app-grid">
+            
+            <div class="app-icon" data-app="api">
+                <div class="app-icon-img" style="background-color: #ff9800;">
+                    🔑
+                </div>
+                <div class="app-icon-label">API</div>
+            </div>
+
+            <div class="app-icon" data-app="chat">
+                <div class="app-icon-img" style="background-color: #2196f3;">
+                    💬
+                </div>
+                <div class="app-icon-label">聊天</div>
+            </div>
+        </div>
+
+
+        <div class="api-app" id="apiAppScreen" style="display: none;">
+            
+            <div class="api-header">
+                <button class="back-btn" onclick="showHomeScreen()">←</button>
+                <div class="api-title">API 配置与连接</div>
+            </div>
+
+            <div class="api-config-area">
+                <h3>外部 API 设置</h3>
+
+                <label for="apiUrl">反代 API 地址 (URL):</label>
+                <input type="url" id="apiUrl" placeholder="例如: https://your-proxy-domain/v1">
+                
+                <label for="apiKey">API 密钥 (Key):</label>
+                <input type="password" id="apiKey" placeholder="输入您的密钥 (例如: sk-xxxx)">
+                <div id="modelSelectionArea" style="display: none; margin-top: 20px;">
+                    <label for="modelSelect">选择模型:</label>
+                    <select id="modelSelect">
+                        <option value="">请先保存配置...</option>
+                    </select>
+                </div>
+                
+                <button class="save-btn" onclick="saveApiConfig()">保存配置</button>
+            </div>
+
+            <div class="api-status" id="apiStatus">
+                当前状态: 未连接
+            </div>
+
+        </div>
+
+
+        <div class="chat-app" id="chatAppScreen" style="display: none;">
+            
+            <div class="chat-header">
+                <button class="back-btn" onclick="showHomeScreen()">←</button>
+                <div class="chat-title">AI 聊天助手</div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message received">
+                    欢迎！我是您的专属AI助手。有什么可以帮您的吗？
+                </div>
+                <div class="message sent">
+                    你好，我们来测试一下。
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="输入消息..." maxlength="200">
+                <button id="sendBtn" onclick="sendMessage()">发送</button>
+            </div>
+
+        </div>
+
+
+        <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 100px; height: 4px; background-color: #333; border-radius: 2px;"></div>
+
+    </div> <script>
+        // JavaScript 逻辑部分
+        
+        // 获取主要界面元素
+        const chatAppScreen = document.getElementById('chatAppScreen');
+        const apiAppScreen = document.getElementById('apiAppScreen');
+
+        // 1. 获取所有 APP 图标并设置点击事件
+        const appIcons = document.querySelectorAll('.app-icon');
+        appIcons.forEach(icon => {
+            icon.addEventListener('click', function() {
+                const appName = this.getAttribute('data-app');
+                openApp(appName);
+            });
+        });
+
+        // 2. APP 切换函数
+        function openApp(appName) {
+            // 确保先隐藏所有 APP 界面
+            chatAppScreen.style.display = 'none';
+            apiAppScreen.style.display = 'none';
+
+            // 隐藏主页元素
+            document.querySelector('.app-grid').style.display = 'none';
+            document.querySelector('.status-bar').style.display = 'none';
+            document.querySelector('.phone-screen > div:last-child').style.display = 'none';
+
+            if (appName === 'chat') {
+                chatAppScreen.style.display = 'flex'; // 显示聊天 APP
+            } else if (appName === 'api') {
+                apiAppScreen.style.display = 'flex'; // 显示 API APP
+            }
+        }
+
+        // 3. 返回主界面的函数
+        function showHomeScreen() {
+            chatAppScreen.style.display = 'none'; // 隐藏聊天 APP
+            apiAppScreen.style.display = 'none'; // 隐藏 API APP
+
+            // 显示主页元素
+            document.querySelector('.app-grid').style.display = 'grid'; // 显示主页图标
+            document.querySelector('.status-bar').style.display = 'flex'; // 显示状态栏
+            document.querySelector('.phone-screen > div:last-child').style.display = 'block'; // 显示底部指示条
+        }
+        
+       // 4. 模拟保存 API 配置的函数
+        function saveApiConfig() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const statusElement = document.getElementById('apiStatus');
+
+            if (apiUrl && apiKey) {
+                // 存储到浏览器的本地存储 (localStorage)
+                localStorage.setItem('apiUrl', apiUrl);
+                localStorage.setItem('apiKey', apiKey);
+                
+                // 1. 显示模型选择区域
+                document.getElementById('modelSelectionArea').style.display = 'block';
+
+                // 2. 模拟识别并加载模型
+                loadModels(apiUrl);
+                
+                // 3. 更新状态
+                statusElement.style.color = 'orange';
+                statusElement.textContent = '当前状态: 配置已保存！请选择一个模型。';
+            } else {
+                statusElement.style.color = 'red';
+                statusElement.textContent = '当前状态: 配置不完整，请填写 URL 和 Key！';
+                document.getElementById('modelSelectionArea').style.display = 'none';
+                alert('请填写完整的 API 地址和密钥！');
+            }
+        }
+        
+        // 5. 模拟加载模型的函数 (新增)
+        function loadModels(url) {
+            const modelSelect = document.getElementById('modelSelect');
+            modelSelect.innerHTML = ''; // 清空现有选项
+            
+            let models = [];
+            let provider = "未知服务";
+
+            // ⚠️ 模拟后端根据 URL 识别 API 服务
+            if (url.includes('openai') || url.includes('/v1')) {
+                provider = "OpenAI / 反代服务";
+                models = [
+                    'gpt-4o', 
+                    'gpt-4-turbo', 
+                    'gpt-3.5-turbo'
+                ];
+            } else if (url.includes('claude') || url.includes('anthropic')) {
+                provider = "Anthropic / Claude 服务";
+                models = [
+                    'claude-3-sonnet',
+                    'claude-3-opus',
+                    'claude-3-haiku'
+                ];
+            } else {
+                models = ['default-model-01', 'custom-model-02'];
+            }
+            
+            // 提示用户服务类型
+            document.getElementById('apiStatus').textContent = `当前状态: 识别服务为 [${provider}]。请选择模型。`;
+
+            // 填充模型选项
+            models.forEach((model, index) => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                modelSelect.appendChild(option);
+                
+                // 默认选中第一个模型，并存入 localStorage
+                if (index === 0) {
+                     modelSelect.value = model;
+                     localStorage.setItem('selectedModel', model);
+                }
+            });
+            
+            // 监听模型选择变化，实时存储
+            modelSelect.onchange = function() {
+                localStorage.setItem('selectedModel', modelSelect.value);
+                document.getElementById('apiStatus').textContent = `当前状态: 已选择模型 [${modelSelect.value}]。`;
+            };
+        }
+        
+        // 6. 消息发送函数 (保持不变)
+        function sendMessage() {
+            // ... (保持不变) ...
+            const input = document.getElementById('chatInput');
+            const messageText = input.value.trim();
+            
+            if (messageText) {
+                // ⚠️ 后续我们将在这里调用真正的聊天逻辑
+                const model = localStorage.getItem('selectedModel') || '未选择模型';
+                alert(`模拟发送消息:\n模型: ${model}\n消息: "${messageText}"`);
+                input.value = ''; 
+            }
+        }
+
+        // ... (其他函数，如 showHomeScreen, updateTime 保持不变) ...
+
+        // 7. 动态更新时间函数
+        function updateTime() {
+            const timeElement = document.querySelector('.status-bar span:first-child');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false 
+            });
+            timeElement.textContent = timeString;
+        }
+
+        // 8. 启动时间更新
+        updateTime(); 
+        setInterval(updateTime, 1000); 
+
+    </script>
+</body>
+</html>
