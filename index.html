@@ -1232,7 +1232,7 @@
             showApp('roleList');
         }
         
-        // 11. 加载角色列表
+        // 11. 加载角色列表 (修复：确保短按可以进入聊天)
         function loadRoleList() {
             const roleListDiv = document.getElementById('roleList');
             roles = JSON.parse(localStorage.getItem('roles') || '[]');
@@ -1248,30 +1248,47 @@
                 card.className = 'role-card';
                 card.setAttribute('data-id', role.id);
                 
-                // 默认的短按事件：开始聊天 (绑定到 click 事件)
-                card.onclick = (e) => startChat(role.id, e); 
-                
-                // 长按监听
                 let pressTimer;
+                let isLongPress = false; // 新增标记，用于区分是长按还是短按
+
+                // 移除 card.onclick，我们使用 touchend/mouseup 来触发短按
                 
+                // 开始按下计时
                 const startPress = (e) => {
-                    e.preventDefault(); 
+                    // ⚠️ 关键修改 1: 移除 e.preventDefault()，确保 click 事件可以正常触发
+                    isLongPress = false;
                     clearTimeout(pressTimer); 
                     pressTimer = setTimeout(() => {
+                        isLongPress = true; // 达到 500ms，标记为长按
                         showRoleActionMenu(role.id);
+                        // ⚠️ 关键：这里不需要阻止默认行为，让长按菜单显示即可
                     }, 500); 
                 };
 
+                // 结束按下：判断是短按还是长按
+                const endPress = () => {
+                    clearTimeout(pressTimer);
+                    if (!isLongPress) {
+                        // 如果计时器被清除了，且不是长按，则认为是短按
+                        // ⚠️ 关键修改 2: 短按时直接调用 startChat，不依赖 click 事件类型
+                        startChat(role.id);
+                    }
+                    isLongPress = false; // 重置
+                };
+                
                 const cancelPress = () => {
                     clearTimeout(pressTimer);
-                };
+                    isLongPress = false;
+                }
 
+                // 统一处理触摸和鼠标事件
                 card.addEventListener('touchstart', startPress, false);
-                card.addEventListener('touchend', cancelPress, false);
+                card.addEventListener('touchend', endPress, false); // 抬起时触发短按逻辑
                 card.addEventListener('mousedown', startPress, false);
-                card.addEventListener('mouseup', cancelPress, false);
+                card.addEventListener('mouseup', endPress, false); // 抬起时触发短按逻辑
                 card.addEventListener('mouseleave', cancelPress, false); 
-                
+                card.addEventListener('click', (e) => e.preventDefault(), false); // 阻止可能残留的 click 行为
+
                 const avatar = document.createElement('div');
                 avatar.className = 'role-avatar';
                 avatar.textContent = role.name[0].toUpperCase();
@@ -1287,30 +1304,27 @@
             });
         }
         
-        // 12. 开始聊天 (包含加载历史记录)
-        function startChat(roleId, event) {
-            // 确保只在短按(click)时执行
-            if (event && event.type === 'click') { 
-                currentRoleId = roleId;
-                const role = roles.find(r => r.id === roleId);
-                
-                if (!role) {
-                     alert("角色不存在！");
-                     return;
-                }
-
-                // 使用对方昵称，如果没有则使用角色名称
-                const aiNickname = localStorage.getItem('chat_ai_nickname') || '';
-                const displayName = aiNickname || role.name;
-                document.getElementById('chatDetailTitle').textContent = displayName;
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML = '';
-                
-                // ⚠️ 关键修复：加载聊天历史记录
-                loadChatHistory(roleId); 
-                
-                showApp('chatDetail');
+       // 12. 开始聊天 (移除事件检查，被 loadRoleList 直接调用)
+        function startChat(roleId) {
+            currentRoleId = roleId;
+            const role = roles.find(r => r.id === roleId);
+            
+            if (!role) {
+                 alert("角色不存在！");
+                 return;
             }
+
+            // 使用对方昵称，如果没有则使用角色名称
+            const aiNickname = localStorage.getItem('chat_ai_nickname') || '';
+            const displayName = aiNickname || role.name;
+            document.getElementById('chatDetailTitle').textContent = displayName;
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            // 加载聊天历史记录
+            loadChatHistory(roleId); 
+            
+            showApp('chatDetail');
         }
         
         // 13. 显示角色操作菜单 (修复 Z-Index 遮挡)
