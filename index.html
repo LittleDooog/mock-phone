@@ -1,493 +1,1008 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API 聊天小手机</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小手机 - AI 聊天模拟器</title>
+    
     <style>
-        /* CSS 样式部分 */
-        
         /* 1. 手机外壳和居中 */
         body {
-            display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: center;   /* 垂直居中 */
-            min-height: 100vh;     /* 确保占满视口高度 */
+            /* 恢复居中布局，仅在大屏幕下生效 */
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            
+            min-height: 100vh;
             margin: 0;
-            background-color: #e0e0e0; /* 网页背景色 */
+            background-color: #e0e0e0; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 100vw; 
         }
 
         /* 2. 模拟手机屏幕 */
         .phone-screen {
-            width: 360px; /* 屏幕宽度 */
-            height: 640px; /* 屏幕高度 */
+            width: 375px; 
+            height: 667px; 
+            
             background-color: #f8f8f8;
-            border: 10px solid #333; /* 手机边框 */
-            border-radius: 40px; /* 手机圆角 */
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden; /* 隐藏超出屏幕的内容 */
+            border: 1px solid #333; 
+            border-radius: 40px; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.2); 
+
+            position: relative; /* 关键：确保长按菜单绝对定位的上下文 */
+            overflow: hidden;
+            display: flex; /* 关键：启用 Flex 布局 */
+            flex-direction: column; /* 关键：子元素垂直排列 */
+        }
+
+        /* 媒体查询：在小屏幕（手机）上应用全屏样式 */
+        @media screen and (max-width: 768px) {
+            .phone-screen {
+                width: 100vw;  
+                height: 100vh; 
+                border: none; 
+                border-radius: 0; 
+                box-shadow: none; 
+            }
         }
 
         /* 3. 顶部状态栏 */
         .status-bar {
-            padding: 5px 15px;
+            height: 30px;
             background-color: #f8f8f8;
+            padding: 5px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 12px;
+            font-weight: 600;
             color: #333;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #ddd;
         }
 
-        /* 4. APP 网格区域 (主界面) */
-        .app-grid {
-            padding: 20px 10px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 每行4个图标 */
-            gap: 20px 0px; /* 行间距和列间距 */
-            text-align: center;
-        }
-
-        /* 5. 单个 APP 图标 */
-        .app-icon {
-            cursor: pointer;
+        /* 4. 头部导航 (Home/返回) */
+        .header {
+            height: 44px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            user-select: none;
+            padding: 0 15px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+            z-index: 10;
+            position: relative; 
+            width: 100%; 
+            box-sizing: border-box;
+        }
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            flex-grow: 1;
+            text-align: center;
+            margin: 0;
+            padding: 0 50px; /* 增加左右内边距，防止与按钮重叠 */
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .back-btn, .home-btn {
+            font-size: 16px; 
+            color: #007aff;
+            cursor: pointer;
+            z-index: 20; 
+            position: absolute; 
+            left: 15px; 
+            font-weight: 400; 
+        }
+        
+        /* 5. 核心内容区域 (appContainer) */
+        .content {
+            flex-grow: 1; /* 关键：确保占据 phone-screen 剩余的垂直空间 */
+            overflow-y: auto;
+            padding: 20px; 
+            background-color: #fff;
+            position: relative;
         }
 
-        .app-icon-img {
+        /* 6. 主页图标网格 */
+        .app-grid {
+            display: flex;
+            flex-wrap: wrap;
+            padding-top: 20px;
+        }
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            margin: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .app-icon img {
             width: 60px;
             height: 60px;
-            border-radius: 15px;
-            background-color: #ccc;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .app-icon p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: #333;
+        }
+
+        /* 7. API 设置页面样式 */
+        .api-settings {
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
+        .api-settings label {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        /* 新增/修复：API 内容区域样式 */
+        .api-content {
+            flex-grow: 1;
+            overflow-y: auto; 
+            padding: 20px;
+            background-color: #fff; 
+        }
+        .api-settings input[type="text"], .api-settings input[type="password"], .api-settings select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 25px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .save-btn:hover {
+            background-color: #0056b3;
+        }
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        .api-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            resize: none; 
+        }
+        
+        /* 8. 聊天/角色列表页面样式 */
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column; /* 关键：垂直布局 */
+            overflow: hidden;
+            padding: 0;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f8f8f8;
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background-color: #fff;
+        }
+        .chat-input-area input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        .chat-input-area button {
+            padding: 10px 20px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .chat-input-area button:disabled {
+            background-color: #a0c4ff;
+            cursor: default;
+        }
+
+        /* 9. 消息气泡样式 */
+        .message {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .message.sent {
+            background-color: #007aff;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        .message.received {
+            background-color: #e5e5ea;
+            color: black;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+        .message.thinking {
+            background-color: #ffe0b2; 
+            color: #333;
+            margin-right: auto;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1.0; }
+            100% { opacity: 0.6; }
+        }
+        
+        /* 10. 角色列表和按钮样式 */
+        .add-model-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .add-role-btn {
+            font-size: 24px;
+            color: #007aff;
+            cursor: pointer;
+            z-index: 20;
+            position: absolute;
+            right: 15px;
+            font-weight: 400;
+        }
+        .role-list-content {
+            padding: 0; 
+            background-color: #fff;
+        }
+        .role-card {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .role-card:active {
+            background-color: #f0f0f0;
+        }
+        .role-avatar {
+            width: 45px;
+            height: 45px;
+            background-color: #007aff;
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 30px;
-            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-            transition: transform 0.1s;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-right: 15px;
         }
-
-        .app-icon:active .app-icon-img {
-            transform: scale(0.95);
+        .role-info h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
         }
-
-        .app-icon-label {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #333;
-            max-width: 70px;
-            overflow: hidden;
+        .role-info p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            color: #888;
             white-space: nowrap;
+            overflow: hidden;
             text-overflow: ellipsis;
+            max-width: 250px;
         }
 
-        /* --- APP 通用样式 --- */
-        .chat-app, .api-app {
-            position: absolute;
+        /* 11. 角色操作弹出菜单样式 (修复 Z-Index 和定位) */
+        #roleActionMenu {
+            position: absolute; /* 限制在 phone-screen 内部 */
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #f0f0f0;
-            display: flex; 
-            flex-direction: column;
+            z-index: 1000;
+            /* 关键修复：默认隐藏，不响应点击 */
+            visibility: hidden; 
+            pointer-events: none; 
+            background: rgba(0, 0, 0, 0.4); 
+        }
+        /* 当 JS 激活时，恢复可见性和点击 */
+        #roleActionMenu.is-active {
+            visibility: visible !important; 
+            pointer-events: auto !important; 
         }
 
-        /* 头部样式 (聊天和API通用) */
-        .chat-header, .api-header {
-            padding: 10px 15px;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
+        .menu-content {
+            position: absolute; /* 限制在 phone-screen 内部 */
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            z-index: 1001;
+            transition: bottom 0.3s ease-out;
+            margin-bottom: 20px; 
+        }
+        .menu-content button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 8px;
+            border: none;
+            border-radius: 12px;
             font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-        .back-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            margin-right: 15px;
+            font-weight: 600;
             cursor: pointer;
-            color: #2196f3;
+            background-color: white;
+            color: #007aff;
         }
-
-
-        /* 6. 聊天 APP 样式 */
-        .chat-messages {
-            flex-grow: 1; 
-            padding: 10px;
-            overflow-y: auto; 
-        }
-
-        .message {
-            max-width: 75%;
-            margin: 5px 0;
-            padding: 8px 12px;
-            border-radius: 18px;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .message.received {
-            background-color: #ffffff;
-            color: #333;
-            margin-right: auto;
-            border-bottom-left-radius: 4px;
-        }
-
-        .message.sent {
-            background-color: #2196f3;
-            color: #fff;
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 10px;
-            background-color: #fff;
-            border-top: 1px solid #ddd;
-        }
-        #chatInput {
-            flex-grow: 1;
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            margin-right: 10px;
-            font-size: 14px;
-        }
-        #sendBtn {
-            background-color: #2196f3;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 15px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-
-        /* 7. API APP 样式 */
-        .api-config-area {
-            padding: 20px;
-        }
-
-        .api-config-area h3 {
-            margin-top: 0;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .api-config-area label {
-            display: block;
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
-            margin-top: 15px;
-            font-weight: 500;
-        }
-
-        .api-config-area input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-
-        .save-btn {
-            width: 100%;
-            margin-top: 25px;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .save-btn:hover {
-            background-color: #45a049;
-        }
-        
-        .api-status {
-            padding: 0 20px;
-            margin-top: 10px;
-            font-size: 14px;
-            color: #777;
-        }
-
-        /* 8. 模型选择样式 */
-        .api-config-area select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 14px;
-            background-color: #fff;
-            appearance: none; /* 移除默认下拉箭头 */
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.7c-5.9%200-11.3%203.2-13.2%208.6-1.9%205.4-.5%2011.6%204.3%2016.3l128%20128c4.8%204.8%2011%206.8%2016.3%206.8s11.5-2%2016.3-6.8l128-128c4.8-4.7%206.2-10.9%204.3-16.3z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 10px;
+        .menu-content button#deleteRoleBtn {
+            color: #dc3545; 
         }
     </style>
 </head>
 <body>
 
-    <div class="phone-screen" id="phoneScreen">
-        
+    <div class="phone-screen">
         <div class="status-bar">
-            <span>01:56:00 AM</span> <span>📶 LTE 🔋</span>
+            <span>9:41 AM</span>
+            <span>LTE</span>
+            <span>🔋 100%</span>
         </div>
 
-        <div class="app-grid">
+        <div id="appContainer" class="content">
             
-            <div class="app-icon" data-app="api">
-                <div class="app-icon-img" style="background-color: #ff9800;">
-                    🔑
+            <div id="homeScreen">
+                <div class="app-grid">
+                    <div class="app-icon" onclick="showApp('api')">
+                        <img src="https://img.icons8.com/color/96/key.png" alt="API Key Icon">
+                        <p>API</p>
+                    </div>
+                    <div class="app-icon" onclick="showApp('chat')">
+                        <img src="https://img.icons8.com/color/96/speech-bubble--v1.png" alt="聊天图标">
+                        <p>聊天</p>
+                    </div>
                 </div>
-                <div class="app-icon-label">API</div>
             </div>
 
-            <div class="app-icon" data-app="chat">
-                <div class="app-icon-img" style="background-color: #2196f3;">
-                    💬
+            <div id="apiScreen" class="api-settings" style="display:none;">
+                <div class="header">
+                    <span class="back-btn" onclick="showHomeScreen()">返回</span>
+                    <h1>API 设置</h1>
                 </div>
-                <div class="app-icon-label">聊天</div>
+                <div class="api-content"> 
+                    <label for="apiUrl">反代地址 (URL):</label>
+                    <input type="text" id="apiUrl" placeholder="例如: https://gcli.ggchan.dev">
+
+                    <label for="apiKey">API 密钥 (Key):</label>
+                    <input type="password" id="apiKey" placeholder="输入您的 Key">
+                    
+                    <button class="save-btn" onclick="fetchModelsAndSave()">拉取模型并保存</button> 
+
+                    <div id="modelSelectionArea" style="display: none; margin-top: 20px;">
+                        <label for="modelSelect">选择模型:</label>
+                        <select id="modelSelect">
+                            <option value="">请先拉取模型...</option>
+                        </select>
+                        
+                        <label for="customModelInput" style="margin-top: 20px;">手动输入模型名称:</label>
+                        <input type="text" id="customModelInput" placeholder="例如: gemini-2.5-flash">
+                        <button class="add-model-btn" onclick="addCustomModel()">添加并使用</button>
+                    </div>
+
+                    <div id="apiStatus" class="status-message" style="margin-top: 20px;">
+                        当前状态: 未配置
+                    </div>
+                </div>
             </div>
-        </div>
 
-
-        <div class="api-app" id="apiAppScreen" style="display: none;">
-            
-            <div class="api-header">
-                <button class="back-btn" onclick="showHomeScreen()">←</button>
-                <div class="api-title">API 配置与连接</div>
-            </div>
-
-            <div class="api-config-area">
-                <h3>外部 API 设置</h3>
-
-                <label for="apiUrl">反代 API 地址 (URL):</label>
-                <input type="url" id="apiUrl" placeholder="例如: https://your-proxy-domain/v1">
+            <div id="roleListScreen" class="chat-container" style="display:none;">
+                <div class="header">
+                    <span class="back-btn" onclick="showHomeScreen()">返回</span>
+                    <h1>消息</h1>
+                    <span class="add-role-btn" onclick="showApp('roleManager')">➕</span>
+                </div>
                 
-                <label for="apiKey">API 密钥 (Key):</label>
-                <input type="password" id="apiKey" placeholder="输入您的密钥 (例如: sk-xxxx)">
-                <div id="modelSelectionArea" style="display: none; margin-top: 20px;">
-                    <label for="modelSelect">选择模型:</label>
-                    <select id="modelSelect">
-                        <option value="">请先保存配置...</option>
-                    </select>
+                <div id="roleList" class="content role-list-content">
+                    <div style="text-align: center; color: #888; margin-top: 50px;">
+                        暂无角色，请点击右上角 ➕ 添加。
+                    </div>
                 </div>
-                
-                <button class="save-btn" onclick="saveApiConfig()">保存配置</button>
             </div>
 
-            <div class="api-status" id="apiStatus">
-                当前状态: 未连接
+            <div id="roleManagerScreen" class="api-settings" style="display:none;">
+                <div class="header">
+                    <span class="back-btn" onclick="showApp('roleList')">返回</span>
+                    <h1>管理角色</h1>
+                </div>
+                <div class="api-content">
+                    <label for="roleName">角色名称:</label>
+                    <input type="text" id="roleName" placeholder="例如: 冷静的客服机器人">
+
+                    <label for="systemPrompt">系统提示词 (Prompt):</label>
+                    <textarea id="systemPrompt" rows="5" placeholder="例如: 你是一位专业、冷静的客服。请简洁地回答用户的问题。"></textarea>
+
+                    <label for="roleModelSelect">选择模型:</label>
+                    <select id="roleModelSelect">
+                        </select>
+                    
+                    <button class="save-btn" onclick="saveRole()">保存角色</button> 
+                    <button class="delete-btn" onclick="deleteRole()" style="margin-top: 10px; background-color: #dc3545;">删除角色</button> 
+                </div>
             </div>
 
+            <div id="chatDetailScreen" class="chat-container" style="display:none;">
+                <div class="header">
+                    <span class="back-btn" onclick="showApp('roleList')">返回</span>
+                    <h1 id="chatDetailTitle">角色名称</h1>
+                </div>
+                <div id="chatMessages" class="chat-messages">
+                    </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="输入您的消息...">
+                    <button id="sendBtn" onclick="sendMessage()">发送</button>
+                </div>
+            </div>
+
+        </div> <div id="roleActionMenu" style="display: none;">
+            <div id="menuContent" class="menu-content">
+                <button id="deleteRoleBtn" onclick="confirmDeleteRole()">删除角色</button>
+                <button onclick="hideRoleActionMenu()">取消</button>
+            </div>
         </div>
-
-
-        <div class="chat-app" id="chatAppScreen" style="display: none;">
-            
-            <div class="chat-header">
-                <button class="back-btn" onclick="showHomeScreen()">←</button>
-                <div class="chat-title">AI 聊天助手</div>
-            </div>
-
-            <div class="chat-messages" id="chatMessages">
-                <div class="message received">
-                    欢迎！我是您的专属AI助手。有什么可以帮您的吗？
-                </div>
-                <div class="message sent">
-                    你好，我们来测试一下。
-                </div>
-            </div>
-
-            <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="输入消息..." maxlength="200">
-                <button id="sendBtn" onclick="sendMessage()">发送</button>
-            </div>
-
-        </div>
-
-
-        <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 100px; height: 4px; background-color: #333; border-radius: 2px;"></div>
-
+        
     </div> <script>
-        // JavaScript 逻辑部分
+        // 1. 全局变量和初始化
+        let currentScreen = 'home';
+        const screens = {
+            home: document.getElementById('homeScreen'),
+            api: document.getElementById('apiScreen'),
+            roleList: document.getElementById('roleListScreen'),
+            roleManager: document.getElementById('roleManagerScreen'),
+            chatDetail: document.getElementById('chatDetailScreen')
+        };
+        let roles = [];
+        let currentRoleId = null;
         
-        // 获取主要界面元素
-        const chatAppScreen = document.getElementById('chatAppScreen');
-        const apiAppScreen = document.getElementById('apiAppScreen');
-
-        // 1. 获取所有 APP 图标并设置点击事件
-        const appIcons = document.querySelectorAll('.app-icon');
-        appIcons.forEach(icon => {
-            icon.addEventListener('click', function() {
-                const appName = this.getAttribute('data-app');
-                openApp(appName);
-            });
-        });
-
-        // 2. APP 切换函数
-        function openApp(appName) {
-            // 确保先隐藏所有 APP 界面
-            chatAppScreen.style.display = 'none';
-            apiAppScreen.style.display = 'none';
-
-            // 隐藏主页元素
-            document.querySelector('.app-grid').style.display = 'none';
-            document.querySelector('.status-bar').style.display = 'none';
-            document.querySelector('.phone-screen > div:last-child').style.display = 'none';
-
-            if (appName === 'chat') {
-                chatAppScreen.style.display = 'flex'; // 显示聊天 APP
-            } else if (appName === 'api') {
-                apiAppScreen.style.display = 'flex'; // 显示 API APP
-            }
-        }
-
-        // 3. 返回主界面的函数
-        function showHomeScreen() {
-            chatAppScreen.style.display = 'none'; // 隐藏聊天 APP
-            apiAppScreen.style.display = 'none'; // 隐藏 API APP
-
-            // 显示主页元素
-            document.querySelector('.app-grid').style.display = 'grid'; // 显示主页图标
-            document.querySelector('.status-bar').style.display = 'flex'; // 显示状态栏
-            document.querySelector('.phone-screen > div:last-child').style.display = 'block'; // 显示底部指示条
-        }
-        
-       // 4. 模拟保存 API 配置的函数
-        function saveApiConfig() {
-            const apiUrl = document.getElementById('apiUrl').value.trim();
-            const apiKey = document.getElementById('apiKey').value.trim();
-            const statusElement = document.getElementById('apiStatus');
-
-            if (apiUrl && apiKey) {
-                // 存储到浏览器的本地存储 (localStorage)
-                localStorage.setItem('apiUrl', apiUrl);
-                localStorage.setItem('apiKey', apiKey);
-                
-                // 1. 显示模型选择区域
+        // 初始加载：读取本地存储
+        window.onload = function() {
+            document.getElementById('apiUrl').value = localStorage.getItem('apiUrl') || '';
+            document.getElementById('apiKey').value = localStorage.getItem('apiKey') || '';
+            
+            if (localStorage.getItem('apiUrl') && localStorage.getItem('apiKey')) {
+                useHardcodedModels(); 
+                const selectedModel = localStorage.getItem('selectedModel');
+                if (selectedModel) {
+                    const modelSelect = document.getElementById('modelSelect');
+                    if (modelSelect.querySelector(`option[value="${selectedModel}"]`)) {
+                        modelSelect.value = selectedModel;
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = selectedModel;
+                        option.textContent = selectedModel;
+                        modelSelect.appendChild(option);
+                        modelSelect.value = selectedModel;
+                    }
+                }
                 document.getElementById('modelSelectionArea').style.display = 'block';
+                document.getElementById('apiStatus').style.color = 'gray';
+                document.getElementById('apiStatus').textContent = '当前状态: 已加载上次配置，请点击“拉取模型”验证。';
+            }
+            
+            roles = JSON.parse(localStorage.getItem('roles') || '[]');
+            loadRoleList(); 
+        };
 
-                // 2. 模拟识别并加载模型
-                loadModels(apiUrl);
-                
-                // 3. 更新状态
-                statusElement.style.color = 'orange';
-                statusElement.textContent = '当前状态: 配置已保存！请选择一个模型。';
-            } else {
-                statusElement.style.color = 'red';
-                statusElement.textContent = '当前状态: 配置不完整，请填写 URL 和 Key！';
-                document.getElementById('modelSelectionArea').style.display = 'none';
-                alert('请填写完整的 API 地址和密钥！');
+        // 2. 屏幕切换函数
+        function showScreen(screenName) {
+            for (let key in screens) {
+                screens[key].style.display = 'none';
+            }
+            screens[screenName].style.display = 'flex'; 
+            currentScreen = screenName;
+        }
+
+        function showHomeScreen() {
+            document.getElementById('homeScreen').style.display = 'block'; 
+            screens['api'].style.display = 'none';
+            screens['roleList'].style.display = 'none';
+            screens['roleManager'].style.display = 'none';
+            screens['chatDetail'].style.display = 'none';
+            currentScreen = 'home';
+        }
+        
+        function showApp(appName) {
+            screens['home'].style.display = 'none';
+            screens['api'].style.display = 'none';
+            screens['roleList'].style.display = 'none';
+            screens['roleManager'].style.display = 'none';
+            screens['chatDetail'].style.display = 'none';
+
+            if (appName === 'roleList') {
+                screens['roleList'].style.display = 'flex';
+                loadRoleList(); 
+            } else if (appName === 'roleManager') {
+                screens['roleManager'].style.display = 'flex';
+                loadModelSelectForRole(); 
+            } else if (appName === 'chatDetail') {
+                screens['chatDetail'].style.display = 'flex';
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else if (appName === 'api') {
+                screens['api'].style.display = 'flex';
+            } else if (appName === 'chat') { 
+                showApp('roleList');
             }
         }
         
-        // 5. 模拟加载模型的函数 (新增)
-        function loadModels(url) {
+        // --- API 设置核心逻辑 ---
+
+        // 3. 辅助函数：提供硬编码的模型列表 (作为拉取失败的备用)
+        function getHardcodedModels() {
+            return {
+                provider: "内置通用服务",
+                models: [
+                    'gemini-2.5-flash', 
+                    'gemini-2.5-pro',
+                    'gpt-4o',
+                    'gpt-3.5-turbo',
+                    'claude-3-sonnet'
+                ]
+            };
+        }
+        
+        // 4. 新增：使用硬编码模型列表作为备用方案
+        function useHardcodedModels() {
             const modelSelect = document.getElementById('modelSelect');
-            modelSelect.innerHTML = ''; // 清空现有选项
+            const statusElement = document.getElementById('apiStatus');
+            const { models, provider } = getHardcodedModels();
             
-            let models = [];
-            let provider = "未知服务";
-
-            // ⚠️ 模拟后端根据 URL 识别 API 服务
-            if (url.includes('openai') || url.includes('/v1')) {
-                provider = "OpenAI / 反代服务";
-                models = [
-                    'gpt-4o', 
-                    'gpt-4-turbo', 
-                    'gpt-3.5-turbo'
-                ];
-            } else if (url.includes('claude') || url.includes('anthropic')) {
-                provider = "Anthropic / Claude 服务";
-                models = [
-                    'claude-3-sonnet',
-                    'claude-3-opus',
-                    'claude-3-haiku'
-                ];
-            } else {
-                models = ['default-model-01', 'custom-model-02'];
-            }
-            
-            // 提示用户服务类型
-            document.getElementById('apiStatus').textContent = `当前状态: 识别服务为 [${provider}]。请选择模型。`;
-
-            // 填充模型选项
+            modelSelect.innerHTML = '';
             models.forEach((model, index) => {
                 const option = document.createElement('option');
                 option.value = model;
                 option.textContent = model;
                 modelSelect.appendChild(option);
-                
-                // 默认选中第一个模型，并存入 localStorage
                 if (index === 0) {
-                     modelSelect.value = model;
-                     localStorage.setItem('selectedModel', model);
+                    modelSelect.value = model;
+                    localStorage.setItem('selectedModel', model); 
                 }
             });
+            document.getElementById('modelSelectionArea').style.display = 'block';
+            statusElement.style.color = 'red';
+            statusElement.textContent = `🚨 警告: 无法拉取模型，已使用内置列表。`;
+        }
+
+        // 5. 定制化函数：拉取模型并保存配置
+        async function fetchModelsAndSave() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const statusElement = document.getElementById('apiStatus');
+            const modelSelect = document.getElementById('modelSelect');
+
+            if (!apiUrl || !apiKey) {
+                statusElement.style.color = 'red';
+                statusElement.textContent = '当前状态: 请填写 URL 和 Key！';
+                document.getElementById('modelSelectionArea').style.display = 'none';
+                return;
+            }
             
-            // 监听模型选择变化，实时存储
-            modelSelect.onchange = function() {
-                localStorage.setItem('selectedModel', modelSelect.value);
-                document.getElementById('apiStatus').textContent = `当前状态: 已选择模型 [${modelSelect.value}]。`;
-            };
+            statusElement.style.color = 'orange';
+            statusElement.textContent = '当前状态: 正在向反代服务请求模型列表...';
+            document.getElementById('modelSelectionArea').style.display = 'none'; 
+            
+            localStorage.setItem('apiUrl', apiUrl);
+            localStorage.setItem('apiKey', apiKey);
+
+            try {
+                const base = (apiUrl.endsWith('/')) ? apiUrl.slice(0, -1) : apiUrl;
+                const testUrls = [`${base}/models`, `${base}/v1/models`];
+                let modelsResult = null;
+                
+                for (const url of testUrls) {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {'Authorization': `Bearer ${apiKey}`}
+                    });
+                    
+                    if (response.ok) {
+                        modelsResult = await response.json();
+                        break; 
+                    }
+                }
+
+                if (modelsResult && modelsResult.data && Array.isArray(modelsResult.data)) {
+                    
+                    const models = modelsResult.data.map(m => m.id);
+                    if (models.length === 0) { throw new Error("API接口返回的模型列表为空。"); }
+
+                    modelSelect.innerHTML = '';
+                    models.forEach((model, index) => {
+                        const option = document.createElement('option');
+                        option.value = model;
+                        option.textContent = model;
+                        modelSelect.appendChild(option);
+                        
+                        if (index === 0) {
+                            modelSelect.value = model;
+                            localStorage.setItem('selectedModel', model); 
+                        }
+                    });
+
+                    document.getElementById('modelSelectionArea').style.display = 'block';
+                    document.getElementById('apiStatus').style.color = 'green';
+                    statusElement.textContent = `当前状态: 模型列表拉取成功 (共 ${models.length} 个)！`;
+
+                    modelSelect.onchange = function() {
+                        localStorage.setItem('selectedModel', modelSelect.value);
+                        document.getElementById('apiStatus').textContent = `当前状态: 已选择模型 [${modelSelect.value}]。`;
+                    };
+
+                } else {
+                    throw new Error("模型接口返回格式非标准，回退到内置列表。");
+                }
+
+            } catch (error) {
+                useHardcodedModels(); 
+                statusElement.style.color = 'red';
+                statusElement.textContent = `🚨 错误: 无法拉取真实模型。已回退到内置列表。`;
+                console.error("模型拉取失败，原因：", error);
+            }
         }
         
-        // 6. 消息发送函数 (保持不变)
-        function sendMessage() {
-            // ... (保持不变) ...
-            const input = document.getElementById('chatInput');
-            const messageText = input.value.trim();
+        // 6. 新增函数：手动添加自定义模型
+        function addCustomModel() {
+            const customInput = document.getElementById('customModelInput');
+            const modelSelect = document.getElementById('modelSelect');
+            const newModelName = customInput.value.trim();
+            const statusElement = document.getElementById('apiStatus');
+
+            if (newModelName) {
+                let optionExists = false;
+                for (let i = 0; i < modelSelect.options.length; i++) {
+                    if (modelSelect.options[i].value === newModelName) {
+                        optionExists = true;
+                        break;
+                    }
+                }
+
+                if (!optionExists) {
+                    const newOption = document.createElement('option');
+                    newOption.value = newModelName;
+                    newOption.textContent = newModelName;
+                    modelSelect.appendChild(newOption);
+                }
+                
+                modelSelect.value = newModelName;
+                localStorage.setItem('selectedModel', newModelName);
+                statusElement.style.color = 'green';
+                statusElement.textContent = `当前状态: 已添加并选择了自定义模型 [${newModelName}]。`;
+                customInput.value = ''; 
+                
+            } else {
+                alert('请输入要添加的模型名称！');
+            }
+        }
+        
+        // --- 角色管理逻辑 ---
+        
+        // 9. 辅助函数：加载角色管理页面的模型下拉框
+        function loadModelSelectForRole() {
+            const roleModelSelect = document.getElementById('roleModelSelect');
+            const apiModelSelect = document.getElementById('modelSelect');
+            roleModelSelect.innerHTML = ''; 
+
+            let modelOptions = [];
+
+            if (apiModelSelect && apiModelSelect.options.length > 0) {
+                 for (let i = 0; i < apiModelSelect.options.length; i++) {
+                    if (apiModelSelect.options[i].value) { 
+                        modelOptions.push({
+                            value: apiModelSelect.options[i].value,
+                            text: apiModelSelect.options[i].textContent
+                        });
+                    }
+                }
+            } 
             
-            if (messageText) {
-                // ⚠️ 后续我们将在这里调用真正的聊天逻辑
-                const model = localStorage.getItem('selectedModel') || '未选择模型';
-                alert(`模拟发送消息:\n模型: ${model}\n消息: "${messageText}"`);
-                input.value = ''; 
+            if (modelOptions.length === 0) {
+                const hardcoded = getHardcodedModels().models; 
+                hardcoded.forEach(model => {
+                    modelOptions.push({ value: model, text: model });
+                });
+            }
+
+            modelOptions.forEach(m => {
+                const option = document.createElement('option');
+                option.value = m.value;
+                option.textContent = m.text;
+                roleModelSelect.appendChild(option);
+            });
+            
+            if (roleModelSelect.options.length > 0) {
+                 roleModelSelect.value = roleModelSelect.options[0].value;
             }
         }
 
-        // ... (其他函数，如 showHomeScreen, updateTime 保持不变) ...
+        // 10. 保存角色函数
+        function saveRole() {
+            const name = document.getElementById('roleName').value.trim();
+            const prompt = document.getElementById('systemPrompt').value.trim();
+            const model = document.getElementById('roleModelSelect').value;
 
-        // 7. 动态更新时间函数
-        function updateTime() {
-            const timeElement = document.querySelector('.status-bar span:first-child');
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('zh-CN', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit',
-                hour12: false 
+            if (!name || !prompt || !model) {
+                alert("请填写完整的角色信息!");
+                return;
+            }
+
+            const newRole = {
+                id: Date.now(),
+                name: name,
+                prompt: prompt,
+                model: model,
+                history: [] 
+            };
+            
+            roles.push(newRole);
+            localStorage.setItem('roles', JSON.stringify(roles));
+            
+            alert(`角色 "${name}" 已保存！`);
+            showApp('roleList');
+        }
+        
+        // 11. 加载角色列表
+        function loadRoleList() {
+            const roleListDiv = document.getElementById('roleList');
+            roles = JSON.parse(localStorage.getItem('roles') || '[]');
+            roleListDiv.innerHTML = '';
+            
+            if (roles.length === 0) {
+                 roleListDiv.innerHTML = '<div style="text-align: center; color: #888; margin-top: 50px;">暂无角色，请点击右上角 ➕ 添加。</div>';
+                 return;
+            }
+
+            roles.forEach(role => {
+                const card = document.createElement('div');
+                card.className = 'role-card';
+                card.setAttribute('data-id', role.id);
+                
+                // 默认的短按事件：开始聊天 (绑定到 click 事件)
+                card.onclick = (e) => startChat(role.id, e); 
+                
+                // 长按监听
+                let pressTimer;
+                
+                const startPress = (e) => {
+                    e.preventDefault(); 
+                    clearTimeout(pressTimer); 
+                    pressTimer = setTimeout(() => {
+                        showRoleActionMenu(role.id);
+                    }, 500); 
+                };
+
+                const cancelPress = () => {
+                    clearTimeout(pressTimer);
+                };
+
+                card.addEventListener('touchstart', startPress, false);
+                card.addEventListener('touchend', cancelPress, false);
+                card.addEventListener('mousedown', startPress, false);
+                card.addEventListener('mouseup', cancelPress, false);
+                card.addEventListener('mouseleave', cancelPress, false); 
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'role-avatar';
+                avatar.textContent = role.name[0].toUpperCase();
+
+                const info = document.createElement('div');
+                info.className = 'role-info';
+                info.innerHTML = `<h3>${role.name}</h3>
+                                  <p>模型: ${role.model} - ${role.prompt.substring(0, 30)}...</p>`;
+
+                card.appendChild(avatar);
+                card.appendChild(info);
+                roleListDiv.appendChild(card);
             });
-            timeElement.textContent = timeString;
+        }
+        
+        // 12. 开始聊天 (仅在短按时触发)
+        function startChat(roleId, event) {
+            // 确保只在短按(click)时执行
+            if (event && event.type === 'click') { 
+                currentRoleId = roleId;
+                const role = roles.find(r => r.id === roleId);
+                
+                if (!role) {
+                     alert("角色不存在！");
+                     return;
+                }
+
+                document.getElementById('chatDetailTitle').textContent = role.name;
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML = ''; 
+                appendMessage('ai', `👋 您好，我是 ${role.name}。我的系统提示词是：“${role.prompt}”`);
+                
+                showApp('chatDetail');
+            }
+        }
+        
+        // 13. 显示角色操作菜单 (修复 Z-Index 遮挡)
+        let roleIdToDelete = null; 
+        const menuElement = document.getElementById('roleActionMenu'); 
+
+        function showRoleActionMenu(roleId) {
+            roleIdToDelete = roleId;
+            menuElement.style.display = 'block'; 
+            // 激活可见性和点击事件
+            menuElement.classList.add('is-active'); 
         }
 
-        // 8. 启动时间更新
-        updateTime(); 
-        setInterval(updateTime, 1000); 
+        // 14. 隐藏角色操作菜单
+        function hideRoleActionMenu() {
+            // 移除 CSS Class
+            menuElement.classList.remove('is-active');
+            
+            // 延迟隐藏 display: none
+            setTimeout(() => {
+                menuElement.style.display = 'none'; 
+            }, 100); 
+            
+            roleIdToDelete = null;
+        }
+
+        // 15. 确认删除角色
+        function confirmDeleteRole() {
+            if (roleIdToDelete === null) return;
+            
+            const roleIndex = roles.findIndex(r => r.id === roleIdToDelete);
+            if (roleIndex > -1) {
+                const roleName = roles[roleIndex].name;
+                
+                roles.splice(roleIndex, 1);
+                localStorage.setItem('roles', JSON.stringify(roles));
+                
+                alert(`角色 "${roleName}" 已删除。`);
+                hideRoleActionMenu();
+                loadRoleList(); 
+            }
+        }
+
+
+        // --- 聊天核心逻辑 ---
+
+        // 7. 动态添加消息气泡
+        function appendMessage(sender, text) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = (sender === 'user') ? 'message sent' : 'message received';
+            messageDiv.textContent = text;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+
+        // 8. 聊天消息发送函数 (连接真实 API)
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messageText = input.value.trim();
+            
+            if (!messageText) return; 
+
+            const apiUrl = localStorage.getItem('apiUrl');
+            const apiKey = localStorage.getItem('apiKey');
+            
+            const role = roles.find(r => r.id === currentRoleId);
+            
+            if (!apiUrl || !apiKey || !role) {
+                 appendMessage('ai', '❌ 错误：请先在 API APP 配置密钥，并创建/选择一个角色。');
+                 return;
+            }
+            const model = role.model; 
+            const systemPrompt = role.prompt;
+            
+            appendMessage('user', messageText);
+            input.value = '';
+            
+            input.disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            
+            const thinkingMessage = document.createElement('div');
+            thinkingMessage.className = 'message received thinking';
+            thinkingMessage.textContent = '思考中...';
+            document.getElementById('chatMessages').appendChild(thinkingMessage);
+
+
+            try {
+                const fullUrl = (apiUrl.endsWith('/')) ? `${apiUrl}chat/completions` : `${apiUrl}/v1/chat/completions`;
+                
+                const messages = [
+                    { role: "system", content: systemPrompt },
+                    { role: "user", content: messageText }
+                ];
+
+                const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: messages, 
+                        stream: false
+                    })
+                });
+
+                if(document.getElementById('chatMessages').contains(thinkingMessage)){
+                    document.getElementById('chatMessages').removeChild(thinkingMessage);
+                }
+
+                if (!response.ok) {
+                    const errorJson = await response.json().catch(() => ({error: {message: 'API返回了非JSON错误信息。'}}));
+                    const errorMessage = errorJson.error?.message || `API 错误 (状态码: ${response.status})。请检查 Key 或 URL。`;
+                    appendMessage('ai', `❌ API 调用失败: ${errorMessage.substring(0, 150)}`);
+                    return;
+                }
+
+                const result = await response.json();
+                
+                const aiResponseText = result.choices?.[0]?.message?.content || "AI未返回有效内容。";
+                appendMessage('ai', aiResponseText);
+
+            } catch (error) {
+                if(document.getElementById('chatMessages').contains(thinkingMessage)){
+                    document.getElementById('chatMessages').removeChild(thinkingMessage);
+                }
+                appendMessage('ai', `🚨 连接失败：网络或跨域(CORS)错误。请确认反代服务已开启 CORS！ (${error.message.substring(0, 100)})`);
+
+            } finally {
+                input.disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                input.focus();
+            }
+        }
 
     </script>
 </body>
