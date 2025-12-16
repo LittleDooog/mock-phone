@@ -2,49 +2,54 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/Gh23VcVK/IMG-4878.jpg">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f8f8f8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>小手机 - AI 聊天模拟器</title>
     
     <style>
         /* 1. 手机外壳和居中 */
         body {
-            /* 恢复居中布局，仅在大屏幕下生效 */
             display: flex; 
             justify-content: center;
             align-items: center;
-            
             min-height: 100vh;
             margin: 0;
-            background-color: #e0e0e0; 
+            background-color: #e0e0e0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            max-width: 100vw; 
+            max-width: 100vw;
         }
 
         /* 2. 模拟手机屏幕 */
         .phone-screen {
-            width: 375px; 
+            width: 375px;
             height: 667px; 
-            
             background-color: #f8f8f8;
             border: 1px solid #333; 
             border-radius: 40px; 
             box-shadow: 0 0 20px rgba(0,0,0,0.2); 
-
-            position: relative; /* 关键：确保长按菜单绝对定位的上下文 */
+            position: relative; 
             overflow: hidden;
-            display: flex; /* 关键：启用 Flex 布局 */
-            flex-direction: column; /* 关键：子元素垂直排列 */
+            display: flex;
+            flex-direction: column;
         }
 
         /* 媒体查询：在小屏幕（手机）上应用全屏样式 */
         @media screen and (max-width: 768px) {
             .phone-screen {
-                width: 100vw;  
+                width: 100vw;
                 height: 100vh; 
                 border: none; 
                 border-radius: 0; 
                 box-shadow: none; 
             }
+        }
+
+        /* 隐藏状态栏 */
+        .status-bar.hidden {
+            display: none;
         }
 
         /* 3. 顶部状态栏 */
@@ -71,7 +76,7 @@
             border-bottom: 1px solid #ddd;
             z-index: 10;
             position: relative; 
-            width: 100%; 
+            width: 100%;
             box-sizing: border-box;
         }
         .header h1 {
@@ -80,28 +85,40 @@
             flex-grow: 1;
             text-align: center;
             margin: 0;
-            padding: 0 50px; /* 增加左右内边距，防止与按钮重叠 */
+            padding: 0 50px;
             white-space: nowrap; 
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .back-btn, .home-btn {
-            font-size: 16px; 
+            font-size: 16px;
             color: #007aff;
             cursor: pointer;
             z-index: 20; 
             position: absolute; 
             left: 15px; 
-            font-weight: 400; 
+            font-weight: 400;
         }
         
         /* 5. 核心内容区域 (appContainer) */
         .content {
-            flex-grow: 1; /* 关键：确保占据 phone-screen 剩余的垂直空间 */
+            flex-grow: 1; 
             overflow-y: auto;
-            padding: 20px; 
+            padding: 20px;
             background-color: #fff;
             position: relative;
+        }
+
+        /* APP屏幕无padding，铺满小手机屏幕 */
+        .content.app-mode {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* 主屏幕回到正常padding */
+        .content.home-mode {
+            padding: 20px;
+            overflow-y: auto;
         }
 
         /* 6. 主页图标网格 */
@@ -131,10 +148,12 @@
 
         /* 7. API 设置页面样式 */
         .api-settings {
-            flex-grow: 1; 
+            flex-grow: 1;
             display: flex; 
             flex-direction: column; 
-            overflow: hidden; 
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
         }
         .api-settings label {
             display: block;
@@ -190,16 +209,18 @@
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 14px;
-            resize: none; 
+            resize: none;
         }
         
         /* 8. 聊天/角色列表页面样式 */
         .chat-container {
             flex-grow: 1;
             display: flex;
-            flex-direction: column; /* 关键：垂直布局 */
+            flex-direction: column; 
             overflow: hidden;
             padding: 0;
+            width: 100%;
+            height: 100%;
         }
         .chat-messages {
             flex-grow: 1;
@@ -236,30 +257,60 @@
         }
 
         /* 9. 消息气泡样式 */
+        .message-bubble {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            align-items: flex-end;
+        }
+        
+        .message-bubble.sent {
+            justify-content: flex-end;
+        }
+        
+        .message-bubble.received {
+            justify-content: flex-start;
+        }
+        
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
         .message {
-            max-width: 75%;
+            max-width: 65%;
             padding: 10px 15px;
             border-radius: 18px;
-            margin-bottom: 10px;
             line-height: 1.4;
             word-wrap: break-word;
         }
         .message.sent {
             background-color: #007aff;
             color: white;
-            margin-left: auto;
             border-bottom-right-radius: 4px;
         }
         .message.received {
             background-color: #e5e5ea;
             color: black;
-            margin-right: auto;
             border-bottom-left-radius: 4px;
         }
         .message.thinking {
-            background-color: #ffe0b2; 
+            background-color: #ffe0b2;
             color: #333;
-            margin-right: auto;
             animation: pulse 1.5s infinite;
         }
         @keyframes pulse {
@@ -290,7 +341,7 @@
             font-weight: 400;
         }
         .role-list-content {
-            padding: 0; 
+            padding: 0;
             background-color: #fff;
         }
         .role-card {
@@ -333,25 +384,25 @@
 
         /* 11. 角色操作弹出菜单样式 (修复 Z-Index 和定位) */
         #roleActionMenu {
-            position: absolute; /* 限制在 phone-screen 内部 */
+            position: absolute; 
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 1000;
             /* 关键修复：默认隐藏，不响应点击 */
-            visibility: hidden; 
+            visibility: hidden;
             pointer-events: none; 
             background: rgba(0, 0, 0, 0.4); 
         }
         /* 当 JS 激活时，恢复可见性和点击 */
         #roleActionMenu.is-active {
-            visibility: visible !important; 
+            visibility: visible !important;
             pointer-events: auto !important; 
         }
 
         .menu-content {
-            position: absolute; /* 限制在 phone-screen 内部 */
+            position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
@@ -362,7 +413,7 @@
             border-radius: 15px;
             z-index: 1001;
             transition: bottom 0.3s ease-out;
-            margin-bottom: 20px; 
+            margin-bottom: 20px;
         }
         .menu-content button {
             width: 100%;
@@ -377,7 +428,149 @@
             color: #007aff;
         }
         .menu-content button#deleteRoleBtn {
-            color: #dc3545; 
+            color: #dc3545;
+        }
+        .menu-content button#clearHistoryBtn {
+            color: #ff9500;
+        }
+
+        /* 12. 聊天设置模态框 */
+        #avatarSettingsModal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #avatarSettingsModal.is-active {
+            display: flex !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+
+        .avatar-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 320px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .avatar-modal-content h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .settings-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #999;
+            border-bottom: 3px solid transparent;
+            transition: color 0.3s;
+        }
+
+        .settings-tab-btn.active {
+            color: #007aff;
+            border-bottom-color: #007aff;
+        }
+
+        .settings-tab-content {
+            display: none;
+        }
+
+        .settings-tab-content.active {
+            display: block;
+        }
+
+        .avatar-section {
+            margin-bottom: 20px;
+        }
+
+        .avatar-section label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            overflow: hidden;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-section input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .avatar-modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .avatar-modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .avatar-modal-buttons button.save {
+            background-color: #007aff;
+            color: white;
+        }
+
+        .avatar-modal-buttons button.cancel {
+            background-color: #f0f0f0;
+            color: #333;
         }
     </style>
 </head>
@@ -385,7 +578,7 @@
 
     <div class="phone-screen">
         <div class="status-bar">
-            <span>9:41 AM</span>
+            <span id="statusTime">9:41 AM</span>
             <span>LTE</span>
             <span>🔋 100%</span>
         </div>
@@ -395,12 +588,16 @@
             <div id="homeScreen">
                 <div class="app-grid">
                     <div class="app-icon" onclick="showApp('api')">
-                        <img src="https://img.icons8.com/color/96/key.png" alt="API Key Icon">
+                        <img src="https://img.icons8.com/color/96/key.png" alt="API Key Icon" data-app="api">
                         <p>API</p>
                     </div>
                     <div class="app-icon" onclick="showApp('chat')">
-                        <img src="https://img.icons8.com/color/96/speech-bubble--v1.png" alt="聊天图标">
+                        <img src="https://img.icons8.com/color/96/speech-bubble--v1.png" alt="聊天图标" data-app="chat">
                         <p>聊天</p>
+                    </div>
+                    <div class="app-icon" onclick="showApp('beautify')">
+                        <img src="https://img.icons8.com/color/96/paint-palette.png" alt="美化图标" data-app="beautifyApp">
+                        <p>美化</p>
                     </div>
                 </div>
             </div>
@@ -436,17 +633,54 @@
                 </div>
             </div>
 
+            <div id="beautifyScreen" class="api-settings" style="display:none;">
+                <div class="header">
+                    <span class="back-btn" onclick="showHomeScreen()">返回</span>
+                    <h1>美化</h1>
+                </div>
+                <div class="api-content">
+                    <label for="backgroundUrl">手机背景图片 URL:</label>
+                    <input type="text" id="backgroundUrl" placeholder="例如: https://example.com/bg.jpg">
+
+                    <label for="targetAppSelect">选择要替换的图标:</label>
+                    <select id="targetAppSelect">
+                        <option value="home-bg">手机背景</option>
+                        <option value="api">API 图标</option>
+                        <option value="chat">聊天 图标</option>
+                        <option value="beautifyApp">美化 APP 图标</option>
+                    </select>
+
+                    <label for="iconUrl" style="margin-top: 15px;">图标图片 URL:</label>
+                    <input type="text" id="iconUrl" placeholder="例如: https://example.com/icon.png">
+
+                    <div style="margin-top: 15px; display:flex; gap:10px; align-items:center;">
+                        <button class="save-btn" onclick="applyAndSaveBeautify()">应用并保存</button>
+                        <button class="save-btn" style="background:#6c757d;" onclick="previewBeautify(true)">预览</button>
+                        <button class="save-btn" style="background:#adb5bd;" onclick="previewBeautify(false)">取消预览</button>
+                    </div>
+
+                    <div id="beautifyPreview" style="margin-top:20px; display:flex; gap:12px; align-items:center;">
+                        <div style="flex:1">
+                            <div style="font-weight:600; margin-bottom:6px;">预览</div>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <img id="previewIcon" src="" style="width:64px;height:64px;border-radius:12px;object-fit:cover;border:1px solid #ddd;display:none;">
+                                <div id="previewText" style="color:#666;">在此显示预览</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="beautifyStatus" class="status-message" style="margin-top:20px;">当前状态: 未保存</div>
+                </div>
+            </div>
+
             <div id="roleListScreen" class="chat-container" style="display:none;">
                 <div class="header">
                     <span class="back-btn" onclick="showHomeScreen()">返回</span>
                     <h1>消息</h1>
-                    <span class="add-role-btn" onclick="showApp('roleManager')">➕</span>
-                </div>
+                    <span class="add-role-btn" onclick="showApp('roleManager')">➕</span> </div>
                 
                 <div id="roleList" class="content role-list-content">
                     <div style="text-align: center; color: #888; margin-top: 50px;">
-                        暂无角色，请点击右上角 ➕ 添加。
-                    </div>
+                        暂无角色，请点击右上角 ➕ 添加。 </div>
                 </div>
             </div>
 
@@ -475,9 +709,8 @@
                 <div class="header">
                     <span class="back-btn" onclick="showApp('roleList')">返回</span>
                     <h1 id="chatDetailTitle">角色名称</h1>
-                </div>
-                <div id="chatMessages" class="chat-messages">
-                    </div>
+                    <span style="font-size: 20px; color: #007aff; cursor: pointer; z-index: 20; position: absolute; right: 15px; font-weight: 400;" onclick="showAvatarSettings()">⚙️</span> </div>
+                <div id="chatMessages" class="chat-messages"></div>
                 <div class="chat-input-area">
                     <input type="text" id="chatInput" placeholder="输入您的消息...">
                     <button id="sendBtn" onclick="sendMessage()">发送</button>
@@ -486,8 +719,90 @@
 
         </div> <div id="roleActionMenu" style="display: none;">
             <div id="menuContent" class="menu-content">
+                <button id="clearHistoryBtn" onclick="confirmClearHistory()" style="color: #ff9500;">清空聊天记录</button>
                 <button id="deleteRoleBtn" onclick="confirmDeleteRole()">删除角色</button>
                 <button onclick="hideRoleActionMenu()">取消</button>
+            </div>
+        </div>
+
+        <div id="avatarSettingsModal" style="display: none;">
+            <div class="avatar-modal-content">
+                <h3>聊天设置</h3>
+                
+                <div class="settings-tabs">
+                    <button class="settings-tab-btn active" onclick="switchSettingsTab('avatar')">头像</button>
+                    <button class="settings-tab-btn" onclick="switchSettingsTab('nickname')">昵称</button>
+                    <button class="settings-tab-btn" onclick="switchSettingsTab('background')">背景</button>
+                    <button class="settings-tab-btn" onclick="switchSettingsTab('role')">角色</button>
+                </div>
+
+                <div id="avatarTab" class="settings-tab-content active">
+                    <div class="avatar-section">
+                        <label>我的头像</label>
+                        <div class="avatar-preview" id="userAvatarPreview"></div>
+                        <input type="text" id="userAvatarUrl" placeholder="输入头像 URL 或输入Emoji..." oninput="updateAvatarPreview('user')" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; margin-bottom: 8px;">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 8px;">或选择本地图片：</div>
+                        <input type="file" id="userAvatarFile" accept="image/*" onchange="handleAvatarFileUpload('user')" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 12px;">
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>对方头像</label>
+                        <div class="avatar-preview" id="aiAvatarPreview"></div>
+                        <input type="text" id="aiAvatarUrl" placeholder="输入头像 URL 或输入Emoji..." oninput="updateAvatarPreview('ai')" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; margin-bottom: 8px;">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 8px;">或选择本地图片：</div>
+                        <input type="file" id="aiAvatarFile" accept="image/*" onchange="handleAvatarFileUpload('ai')" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 12px;">
+                    </div>
+                </div>
+
+                <div id="nicknameTab" class="settings-tab-content">
+                    <div class="avatar-section">
+                        <label>我的昵称</label>
+                        <input type="text" id="userNickname" placeholder="输入您的昵称..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; margin-bottom: 8px;">
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>对方昵称</label>
+                        <input type="text" id="aiNickname" placeholder="输入AI的昵称..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; margin-bottom: 8px;">
+                    </div>
+                </div>
+
+                <div id="backgroundTab" class="settings-tab-content">
+                    <div class="avatar-section">
+                        <label>聊天背景颜色</label>
+                        <input type="color" id="chatBgColor" style="width: 100%; height: 40px; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 8px;">
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>背景图片 URL</label>
+                        <input type="text" id="chatBgImage" placeholder="输入背景图片 URL..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; margin-bottom: 8px;">
+                    </div>
+
+                    <div class="avatar-section" style="font-size: 12px; color: #999;">
+                        提示：颜色和图片都设置时，图片优先显示
+                    </div>
+                </div>
+
+                <div id="roleTab" class="settings-tab-content">
+                    <div class="avatar-section">
+                        <label>角色名称</label>
+                        <input type="text" id="editRoleName" placeholder="角色名称" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; margin-bottom: 8px;">
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>系统提示词</label>
+                        <textarea id="editSystemPrompt" placeholder="系统提示词..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 12px; height: 100px; resize: none; margin-bottom: 8px;"></textarea>
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>模型</label>
+                        <select id="editRoleModel" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; margin-bottom: 8px;"></select>
+                    </div>
+                </div>
+
+                <div class="avatar-modal-buttons">
+                    <button class="save" onclick="saveAllSettings()">保存</button>
+                    <button class="cancel" onclick="closeAvatarSettings()">取消</button>
+                </div>
             </div>
         </div>
         
@@ -497,6 +812,7 @@
         const screens = {
             home: document.getElementById('homeScreen'),
             api: document.getElementById('apiScreen'),
+            beautify: document.getElementById('beautifyScreen'),
             roleList: document.getElementById('roleListScreen'),
             roleManager: document.getElementById('roleManagerScreen'),
             chatDetail: document.getElementById('chatDetailScreen')
@@ -510,7 +826,7 @@
             document.getElementById('apiKey').value = localStorage.getItem('apiKey') || '';
             
             if (localStorage.getItem('apiUrl') && localStorage.getItem('apiKey')) {
-                useHardcodedModels(); 
+                useHardcodedModels();
                 const selectedModel = localStorage.getItem('selectedModel');
                 if (selectedModel) {
                     const modelSelect = document.getElementById('modelSelect');
@@ -531,6 +847,12 @@
             
             roles = JSON.parse(localStorage.getItem('roles') || '[]');
             loadRoleList(); 
+            loadBeautifySettings();
+            // 初始化：主屏幕添加 home-mode class
+            document.getElementById('appContainer').classList.add('home-mode');
+            // 启动时钟并每分钟更新一次
+            updateClock();
+            setInterval(updateClock, 60000);
         };
 
         // 2. 屏幕切换函数
@@ -543,21 +865,34 @@
         }
 
         function showHomeScreen() {
-            document.getElementById('homeScreen').style.display = 'block'; 
+            // 恢复为主屏幕并显示状态栏
+            document.getElementById('homeScreen').style.display = 'flex';
             screens['api'].style.display = 'none';
             screens['roleList'].style.display = 'none';
             screens['roleManager'].style.display = 'none';
             screens['chatDetail'].style.display = 'none';
+            screens['beautify'].style.display = 'none';
+            document.querySelector('.status-bar').classList.remove('hidden');
+            document.getElementById('appContainer').classList.remove('app-mode');
+            document.getElementById('appContainer').classList.add('home-mode');
             currentScreen = 'home';
         }
         
         function showApp(appName) {
+            // 进入 APP 时隐藏状态栏，让APP内容铺满小手机屏幕
+            if (appName && appName !== 'home') {
+                document.querySelector('.status-bar').classList.add('hidden');
+                document.getElementById('appContainer').classList.add('app-mode');
+                document.getElementById('appContainer').classList.remove('home-mode');
+            }
+
             screens['home'].style.display = 'none';
             screens['api'].style.display = 'none';
             screens['roleList'].style.display = 'none';
             screens['roleManager'].style.display = 'none';
             screens['chatDetail'].style.display = 'none';
-
+            screens['beautify'].style.display = 'none';
+            
             if (appName === 'roleList') {
                 screens['roleList'].style.display = 'flex';
                 loadRoleList(); 
@@ -568,6 +903,18 @@
                 screens['chatDetail'].style.display = 'flex';
                 const chatMessages = document.getElementById('chatMessages');
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+                // 确保聊天背景在加载完成后应用
+                setTimeout(() => applyChatsBackground(), 50);
+            } else if (appName === 'beautify') {
+                screens['beautify'].style.display = 'flex';
+                // 将已保存值填充到输入框
+                const bg = localStorage.getItem('beautify_background') || '';
+                const iconApi = localStorage.getItem('beautify_icon_api') || '';
+                const iconChat = localStorage.getItem('beautify_icon_chat') || '';
+                const iconBeautify = localStorage.getItem('beautify_icon_beautifyApp') || '';
+                document.getElementById('backgroundUrl').value = bg;
+                document.getElementById('iconUrl').value = '';
+                document.getElementById('beautifyStatus').textContent = '当前状态: 未保存';
             } else if (appName === 'api') {
                 screens['api'].style.display = 'flex';
             } else if (appName === 'chat') { 
@@ -723,6 +1070,102 @@
                 alert('请输入要添加的模型名称！');
             }
         }
+
+        // 6.1 美化功能：加载/应用/预览/保存设置
+        function loadBeautifySettings() {
+            const phone = document.querySelector('.phone-screen');
+            const bg = localStorage.getItem('beautify_background');
+            if (bg) {
+                phone.style.backgroundImage = `url(${bg})`;
+                phone.style.backgroundSize = 'cover';
+                phone.style.backgroundPosition = 'center';
+            } else {
+                phone.style.backgroundImage = '';
+            }
+
+            // 如果设置了背景，则将内部 content 区域背景设为透明以显示背景图
+            const contents = document.querySelectorAll('.content');
+            if (bg) {
+                contents.forEach(c => c.style.background = 'transparent');
+            } else {
+                contents.forEach(c => c.style.background = '#fff');
+            }
+
+            const applyIcon = (dataApp, key) => {
+                const img = document.querySelector(`.app-icon img[data-app="${dataApp}"]`);
+                const saved = localStorage.getItem(key);
+                if (img && saved) img.src = saved;
+            };
+
+            applyIcon('api', 'beautify_icon_api');
+            applyIcon('chat', 'beautify_icon_chat');
+            applyIcon('beautifyApp', 'beautify_icon_beautifyApp');
+        }
+
+        // 6.2 状态栏时钟：更新主屏幕左上角时间
+        function updateClock() {
+            const el = document.getElementById('statusTime');
+            if (!el) return;
+            const now = new Date();
+            let h = now.getHours();
+            const m = now.getMinutes();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            let displayH = h % 12;
+            if (displayH === 0) displayH = 12;
+            el.textContent = `${displayH}:${m.toString().padStart(2,'0')} ${ampm}`;
+        }
+
+        function previewBeautify(isPreview) {
+            const target = document.getElementById('targetAppSelect').value;
+            const iconUrl = document.getElementById('iconUrl').value.trim();
+            const bgUrl = document.getElementById('backgroundUrl').value.trim();
+
+            if (isPreview) {
+                if (target === 'home-bg') {
+                    if (!bgUrl) { alert('请输入背景图片 URL 以预览'); return; }
+                    document.querySelector('.phone-screen').style.backgroundImage = `url(${bgUrl})`;
+                    document.querySelector('.phone-screen').style.backgroundSize = 'cover';
+                    document.querySelectorAll('.content').forEach(c => c.style.background = 'transparent');
+                    document.getElementById('beautifyStatus').textContent = '已预览背景（未保存）';
+                } else {
+                    if (!iconUrl) { alert('请输入图标图片 URL 以预览'); return; }
+                    const targetImg = document.querySelector(`.app-icon img[data-app="${target}"]`);
+                    if (targetImg) targetImg.src = iconUrl;
+                    const previewIcon = document.getElementById('previewIcon');
+                    previewIcon.src = iconUrl;
+                    previewIcon.style.display = 'block';
+                    document.getElementById('previewText').textContent = '';
+                    document.getElementById('beautifyStatus').textContent = '已预览图标（未保存）';
+                }
+            } else {
+                loadBeautifySettings();
+                const previewIcon = document.getElementById('previewIcon');
+                previewIcon.style.display = 'none';
+                document.getElementById('previewText').textContent = '在此显示预览';
+                document.getElementById('beautifyStatus').textContent = '预览已取消';
+            }
+        }
+
+        function applyAndSaveBeautify() {
+            const target = document.getElementById('targetAppSelect').value;
+            const iconUrl = document.getElementById('iconUrl').value.trim();
+            const bgUrl = document.getElementById('backgroundUrl').value.trim();
+
+            if (target === 'home-bg') {
+                if (!bgUrl) { alert('请输入背景图片 URL'); return; }
+                localStorage.setItem('beautify_background', bgUrl);
+                document.querySelectorAll('.content').forEach(c => c.style.background = 'transparent');
+            } else {
+                if (!iconUrl) { alert('请输入图标图片 URL'); return; }
+                const key = `beautify_icon_${target}`;
+                localStorage.setItem(key, iconUrl);
+            }
+
+            loadBeautifySettings();
+            document.getElementById('beautifyStatus').style.color = 'green';
+            document.getElementById('beautifyStatus').textContent = '当前状态: 保存成功！';
+            alert('已保存美化设置');
+        }
         
         // --- 角色管理逻辑 ---
         
@@ -733,7 +1176,6 @@
             roleModelSelect.innerHTML = ''; 
 
             let modelOptions = [];
-
             if (apiModelSelect && apiModelSelect.options.length > 0) {
                  for (let i = 0; i < apiModelSelect.options.length; i++) {
                     if (apiModelSelect.options[i].value) { 
@@ -845,7 +1287,7 @@
             });
         }
         
-        // 12. 开始聊天 (仅在短按时触发)
+        // 12. 开始聊天 (包含加载历史记录)
         function startChat(roleId, event) {
             // 确保只在短按(click)时执行
             if (event && event.type === 'click') { 
@@ -857,10 +1299,15 @@
                      return;
                 }
 
-                document.getElementById('chatDetailTitle').textContent = role.name;
+                // 使用对方昵称，如果没有则使用角色名称
+                const aiNickname = localStorage.getItem('chat_ai_nickname') || '';
+                const displayName = aiNickname || role.name;
+                document.getElementById('chatDetailTitle').textContent = displayName;
                 const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML = ''; 
-                appendMessage('ai', `👋 您好，我是 ${role.name}。我的系统提示词是：“${role.prompt}”`);
+                chatMessages.innerHTML = '';
+                
+                // ⚠️ 关键修复：加载聊天历史记录
+                loadChatHistory(roleId); 
                 
                 showApp('chatDetail');
             }
@@ -873,16 +1320,13 @@
         function showRoleActionMenu(roleId) {
             roleIdToDelete = roleId;
             menuElement.style.display = 'block'; 
-            // 激活可见性和点击事件
             menuElement.classList.add('is-active'); 
         }
 
         // 14. 隐藏角色操作菜单
         function hideRoleActionMenu() {
-            // 移除 CSS Class
             menuElement.classList.remove('is-active');
             
-            // 延迟隐藏 display: none
             setTimeout(() => {
                 menuElement.style.display = 'none'; 
             }, 100); 
@@ -901,27 +1345,131 @@
                 roles.splice(roleIndex, 1);
                 localStorage.setItem('roles', JSON.stringify(roles));
                 
+                // 同时删除聊天记录
+                localStorage.removeItem(`chat_history_${roleIdToDelete}`); 
+                
                 alert(`角色 "${roleName}" 已删除。`);
                 hideRoleActionMenu();
                 loadRoleList(); 
+            }
+        }
+        
+        // 15.1 确认清空聊天记录
+        function confirmClearHistory() {
+            if (roleIdToDelete === null) return;
+            if (confirm('确定要清空该角色的所有聊天记录吗？此操作不可撤销。')) {
+                clearChatHistory(roleIdToDelete);
+                hideRoleActionMenu();
             }
         }
 
 
         // --- 聊天核心逻辑 ---
 
-        // 7. 动态添加消息气泡
-        function appendMessage(sender, text) {
+        // 7. 动态添加消息气泡（带头像）
+        function appendMessage(sender, text, shouldSave = true) {
             const chatMessages = document.getElementById('chatMessages');
             
+            // 创建消息气泡容器
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = `message-bubble ${sender === 'user' ? 'sent' : 'received'}`;
+            
+            // 创建头像
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar';
+            
+            if (sender === 'user') {
+                const userAvatarUrl = localStorage.getItem('chat_user_avatar_url') || '';
+                const userAvatarEmoji = localStorage.getItem('chat_user_avatar_emoji') || '👤'; // 默认emoji
+                
+                if (userAvatarUrl && (userAvatarUrl.startsWith('http') || userAvatarUrl.startsWith('data:'))) {
+                    const img = document.createElement('img');
+                    img.src = userAvatarUrl;
+                    avatarDiv.appendChild(img);
+                } else {
+                    avatarDiv.textContent = userAvatarEmoji.substring(0,2); // 确保只显示少量文字/emoji
+                }
+            } else {
+                const aiAvatarUrl = localStorage.getItem('chat_ai_avatar_url') || '';
+                const aiAvatarEmoji = localStorage.getItem('chat_ai_avatar_emoji') || '🤖'; // 默认emoji
+                
+                if (aiAvatarUrl && (aiAvatarUrl.startsWith('http') || aiAvatarUrl.startsWith('data:'))) {
+                    const img = document.createElement('img');
+                    img.src = aiAvatarUrl;
+                    avatarDiv.appendChild(img);
+                } else {
+                    avatarDiv.textContent = aiAvatarEmoji.substring(0,2);
+                }
+            }
+            
+            // 创建消息内容
             const messageDiv = document.createElement('div');
-            messageDiv.className = (sender === 'user') ? 'message sent' : 'message received';
+            messageDiv.className = `message ${sender === 'user' ? 'sent' : 'received'}`;
             messageDiv.textContent = text;
             
-            chatMessages.appendChild(messageDiv);
+            // 组装气泡
+            if (sender === 'user') {
+                bubbleDiv.appendChild(messageDiv);
+                bubbleDiv.appendChild(avatarDiv);
+            } else {
+                bubbleDiv.appendChild(avatarDiv);
+                bubbleDiv.appendChild(messageDiv);
+            }
+            
+            chatMessages.appendChild(bubbleDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // 保存消息到 localStorage（如果shouldSave为true）
+            if (shouldSave && currentRoleId) {
+                saveChatMessage(currentRoleId, sender, text);
+            }
         }
 
+
+        // 7.1 保存聊天消息到 localStorage
+        function saveChatMessage(roleId, sender, text) {
+            const key = `chat_history_${roleId}`;
+            let history = JSON.parse(localStorage.getItem(key) || '[]');
+            history.push({
+                sender: sender,
+                text: text,
+                timestamp: Date.now()
+            });
+            localStorage.setItem(key, JSON.stringify(history));
+        }
+        
+        // 7.2 加载聊天历史记录
+        function loadChatHistory(roleId) {
+            const key = `chat_history_${roleId}`;
+            const history = JSON.parse(localStorage.getItem(key) || '[]');
+            const chatMessages = document.getElementById('chatMessages');
+
+            if (history.length === 0) {
+                // 如果没有历史记录，显示欢迎消息
+                const role = roles.find(r => r.id === roleId);
+                if (role) {
+                    appendMessage('ai', `👋 您好，我是 ${role.name}。我的系统提示词是：“${role.prompt}”`, false);
+                }
+            } else {
+                // 加载所有历史消息
+                history.forEach(msg => {
+                    appendMessage(msg.sender, msg.text, false);
+                });
+            }
+        }
+        
+        // 7.3 清空聊天记录
+        function clearChatHistory(roleId) {
+            if (!roleId) return;
+            const key = `chat_history_${roleId}`;
+            localStorage.removeItem(key);
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            const role = roles.find(r => r.id === roleId);
+            if (role) {
+                appendMessage('ai', `💬 聊天记录已清空。我是 ${role.name}，很高兴认识您！`, false);
+            }
+        }
 
         // 8. 聊天消息发送函数 (连接真实 API)
         async function sendMessage() {
@@ -932,7 +1480,6 @@
 
             const apiUrl = localStorage.getItem('apiUrl');
             const apiKey = localStorage.getItem('apiKey');
-            
             const role = roles.find(r => r.id === currentRoleId);
             
             if (!apiUrl || !apiKey || !role) {
@@ -948,20 +1495,58 @@
             input.disabled = true;
             document.getElementById('sendBtn').disabled = true;
             
-            const thinkingMessage = document.createElement('div');
-            thinkingMessage.className = 'message received thinking';
-            thinkingMessage.textContent = '思考中...';
-            document.getElementById('chatMessages').appendChild(thinkingMessage);
-
+            // --- 添加 "思考中" 消息气泡 ---
+            const thinkingBubbleDiv = document.createElement('div');
+            thinkingBubbleDiv.className = 'message-bubble received thinking-bubble';
+            
+            const thinkingAvatarDiv = document.createElement('div');
+            thinkingAvatarDiv.className = 'message-avatar';
+            const aiAvatarUrl = localStorage.getItem('chat_ai_avatar_url') || '';
+            const aiAvatarEmoji = localStorage.getItem('chat_ai_avatar_emoji') || '🤖';
+            if (aiAvatarUrl && (aiAvatarUrl.startsWith('http') || aiAvatarUrl.startsWith('data:'))) {
+                const img = document.createElement('img');
+                img.src = aiAvatarUrl;
+                thinkingAvatarDiv.appendChild(img);
+            } else {
+                thinkingAvatarDiv.textContent = aiAvatarEmoji.substring(0,2);
+            }
+            
+            const thinkingMessageDiv = document.createElement('div');
+            thinkingMessageDiv.className = 'message received thinking';
+            thinkingMessageDiv.textContent = '思考中...';
+            
+            thinkingBubbleDiv.appendChild(thinkingAvatarDiv);
+            thinkingBubbleDiv.appendChild(thinkingMessageDiv);
+            document.getElementById('chatMessages').appendChild(thinkingBubbleDiv);
+            
+            // 滚动到底部
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
                 const fullUrl = (apiUrl.endsWith('/')) ? `${apiUrl}chat/completions` : `${apiUrl}/v1/chat/completions`;
                 
-                const messages = [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: messageText }
-                ];
+                // 从历史记录中构建消息体
+                const historyKey = `chat_history_${currentRoleId}`;
+                const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+                
+                // 仅发送最近的几条历史记录 + 当前消息，以防止请求体过大
+                let messages = history.slice(-10).map(msg => ({
+                    role: msg.sender === 'user' ? 'user' : 'assistant',
+                    content: msg.text
+                }));
 
+                // 确保系统提示词在最前面
+                messages.unshift({ role: "system", content: systemPrompt });
+
+                // 移除思考中消息
+                const removeThinking = () => {
+                    const thinkingBubble = chatMessages.querySelector('.thinking-bubble');
+                    if (thinkingBubble) {
+                        chatMessages.removeChild(thinkingBubble);
+                    }
+                };
+                
                 const response = await fetch(fullUrl, {
                     method: 'POST',
                     headers: {
@@ -975,9 +1560,7 @@
                     })
                 });
 
-                if(document.getElementById('chatMessages').contains(thinkingMessage)){
-                    document.getElementById('chatMessages').removeChild(thinkingMessage);
-                }
+                removeThinking();
 
                 if (!response.ok) {
                     const errorJson = await response.json().catch(() => ({error: {message: 'API返回了非JSON错误信息。'}}));
@@ -992,8 +1575,9 @@
                 appendMessage('ai', aiResponseText);
 
             } catch (error) {
-                if(document.getElementById('chatMessages').contains(thinkingMessage)){
-                    document.getElementById('chatMessages').removeChild(thinkingMessage);
+                const thinkingBubble = chatMessages.querySelector('.thinking-bubble');
+                if (thinkingBubble) {
+                    chatMessages.removeChild(thinkingBubble);
                 }
                 appendMessage('ai', `🚨 连接失败：网络或跨域(CORS)错误。请确认反代服务已开启 CORS！ (${error.message.substring(0, 100)})`);
 
@@ -1002,6 +1586,284 @@
                 document.getElementById('sendBtn').disabled = false;
                 input.focus();
             }
+        }
+
+        // 16. 聊天设置功能（头像、昵称、背景、角色）
+        function showAvatarSettings() {
+            const modal = document.getElementById('avatarSettingsModal');
+            // 加载头像设置
+            const userAvatarUrl = localStorage.getItem('chat_user_avatar_url') || '';
+            const userAvatarEmoji = localStorage.getItem('chat_user_avatar_emoji') || '';
+            const aiAvatarUrl = localStorage.getItem('chat_ai_avatar_url') || '';
+            const aiAvatarEmoji = localStorage.getItem('chat_ai_avatar_emoji') || '';
+            document.getElementById('userAvatarUrl').value = userAvatarUrl || userAvatarEmoji;
+            document.getElementById('aiAvatarUrl').value = aiAvatarUrl || aiAvatarEmoji;
+            updateAvatarPreview('user');
+            updateAvatarPreview('ai');
+            // 加载昵称设置
+            const userNickname = localStorage.getItem('chat_user_nickname') || '';
+            const aiNickname = localStorage.getItem('chat_ai_nickname') || '';
+            document.getElementById('userNickname').value = userNickname;
+            document.getElementById('aiNickname').value = aiNickname;
+            // 加载背景设置
+            const chatBgColor = localStorage.getItem('chat_bg_color') || '#f8f8f8';
+            const chatBgImage = localStorage.getItem('chat_bg_image') || '';
+            document.getElementById('chatBgColor').value = chatBgColor;
+            document.getElementById('chatBgImage').value = chatBgImage;
+            // 加载角色设置
+            if (currentRoleId) {
+                const role = roles.find(r => r.id === currentRoleId);
+                if (role) {
+                    document.getElementById('editRoleName').value = role.name;
+                    document.getElementById('editSystemPrompt').value = role.prompt;
+                    
+                    // 加载模型选择
+                    const editRoleModel = document.getElementById('editRoleModel');
+                    const apiModelSelect = document.getElementById('modelSelect');
+                    editRoleModel.innerHTML = '';
+                    
+                    // 优先从 API APP 的下拉框中复制选项
+                    if (apiModelSelect && apiModelSelect.options.length > 0) {
+                        for (let i = 0; i < apiModelSelect.options.length; i++) {
+                            if (apiModelSelect.options[i].value) {
+                                const option = document.createElement('option');
+                                option.value = apiModelSelect.options[i].value;
+                                option.textContent = apiModelSelect.options[i].textContent;
+                                editRoleModel.appendChild(option);
+                            }
+                        }
+                    } else {
+                        const hardcoded = getHardcodedModels().models;
+                        hardcoded.forEach(model => {
+                            const option = document.createElement('option');
+                            option.value = model;
+                            option.textContent = model;
+                            editRoleModel.appendChild(option);
+                        });
+                    }
+                    
+                    editRoleModel.value = role.model;
+                }
+            }
+            
+            modal.style.display = 'flex';
+            modal.classList.add('is-active');
+        }
+
+        function switchSettingsTab(tabName) {
+            // 隐藏所有标签页内容
+            document.querySelectorAll('.settings-tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // 取消激活所有标签按钮
+            document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            // 显示选中的标签页
+            const tabId = {
+                'avatar': 'avatarTab',
+                'nickname': 'nicknameTab',
+                'background': 'backgroundTab',
+                'role': 'roleTab'
+            }[tabName];
+            if (tabId) {
+                document.getElementById(tabId).classList.add('active');
+                // 确保点击的按钮被激活
+                if(event.target.classList.contains('settings-tab-btn')) {
+                    event.target.classList.add('active');
+                } else {
+                    document.querySelector(`.settings-tabs button[onclick*="${tabName}"]`).classList.add('active');
+                }
+            }
+        }
+
+        function closeAvatarSettings() {
+            const modal = document.getElementById('avatarSettingsModal');
+            modal.classList.remove('is-active');
+            // 不立即隐藏display，等待动画完成
+            setTimeout(() => {
+                if (!modal.classList.contains('is-active')) {
+                    modal.style.display = 'none';
+                }
+            }, 300);
+        }
+
+        function handleAvatarFileUpload(type) {
+            const fileInputId = type === 'user' ? 'userAvatarFile' : 'aiAvatarFile';
+            const inputId = type === 'user' ? 'userAvatarUrl' : 'aiAvatarUrl';
+            
+            const fileInput = document.getElementById(fileInputId);
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+            // 检查文件大小（限制为 1MB）
+            if (file.size > 1024 * 1024) {
+                alert('图片文件过大，请选择小于 1MB 的图片');
+                fileInput.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                // 将 Data URL 保存到输入框
+                document.getElementById(inputId).value = dataUrl;
+                // 更新预览
+                updateAvatarPreview(type);
+            };
+            reader.onerror = function() {
+                alert('文件读取失败，请重试');
+                fileInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateAvatarPreview(type) {
+            const inputId = type === 'user' ? 'userAvatarUrl' : 'aiAvatarUrl';
+            const previewId = type === 'user' ? 'userAvatarPreview' : 'aiAvatarPreview';
+            
+            const value = document.getElementById(inputId).value.trim();
+            const preview = document.getElementById(previewId);
+            
+            preview.innerHTML = '';
+            
+            if (value && (value.startsWith('http') || value.startsWith('data:'))) {
+                const img = document.createElement('img');
+                img.src = value;
+                img.onerror = function() {
+                    preview.textContent = '❌'; 
+                };
+                preview.appendChild(img);
+            } else if (value) {
+                preview.textContent = value.substring(0,2);
+                preview.style.fontSize = '32px';
+            } else {
+                preview.textContent = type === 'user' ? '👤' : '🤖';
+                preview.style.fontSize = '32px';
+            }
+        }
+
+        function saveAllSettings() {
+            // 保存头像
+            const userValue = document.getElementById('userAvatarUrl').value.trim();
+            const aiValue = document.getElementById('aiAvatarUrl').value.trim();
+            
+            if (!userValue || !aiValue) {
+                alert('请填写完整的头像信息！');
+                return;
+            }
+            
+            // 区分URL、Data URL（本地上传）和Emoji
+            if (userValue.startsWith('http') || userValue.startsWith('data:')) {
+                localStorage.setItem('chat_user_avatar_url', userValue);
+                localStorage.removeItem('chat_user_avatar_emoji');
+            } else {
+                localStorage.setItem('chat_user_avatar_emoji', userValue);
+                localStorage.removeItem('chat_user_avatar_url');
+            }
+            
+            if (aiValue.startsWith('http') || aiValue.startsWith('data:')) {
+                localStorage.setItem('chat_ai_avatar_url', aiValue);
+                localStorage.removeItem('chat_ai_avatar_emoji');
+            } else {
+                localStorage.setItem('chat_ai_avatar_emoji', aiValue);
+                localStorage.removeItem('chat_ai_avatar_url');
+            }
+            
+            // 保存昵称
+            const userNickname = document.getElementById('userNickname').value.trim();
+            const aiNickname = document.getElementById('aiNickname').value.trim();
+            localStorage.setItem('chat_user_nickname', userNickname);
+            localStorage.setItem('chat_ai_nickname', aiNickname);
+            
+            // 如果在聊天界面，更新顶部显示的昵称
+            if (currentRoleId && currentScreen === 'chatDetail') {
+                const displayName = aiNickname || document.getElementById('chatDetailTitle').textContent;
+                document.getElementById('chatDetailTitle').textContent = displayName;
+            }
+            
+            // 保存背景
+            const chatBgColor = document.getElementById('chatBgColor').value;
+            const chatBgImage = document.getElementById('chatBgImage').value.trim();
+            localStorage.setItem('chat_bg_color', chatBgColor);
+            localStorage.setItem('chat_bg_image', chatBgImage);
+            
+            // 保存角色设置
+            if (currentRoleId) {
+                const newName = document.getElementById('editRoleName').value.trim();
+                const newPrompt = document.getElementById('editSystemPrompt').value.trim();
+                const newModel = document.getElementById('editRoleModel').value;
+                
+                if (!newName || !newPrompt || !newModel) {
+                    alert('请填写完整的角色信息！');
+                    return;
+                }
+                
+                const roleIndex = roles.findIndex(r => r.id === currentRoleId);
+                if (roleIndex > -1) {
+                    roles[roleIndex].name = newName;
+                    roles[roleIndex].prompt = newPrompt;
+                    roles[roleIndex].model = newModel;
+                    localStorage.setItem('roles', JSON.stringify(roles));
+                    // 如果有昵称则显示昵称，否则显示新的角色名称
+                    const aiNickname = localStorage.getItem('chat_ai_nickname') || '';
+                    const displayName = aiNickname || newName;
+                    document.getElementById('chatDetailTitle').textContent = displayName;
+                }
+            }
+            
+            alert('设置已保存！');
+            closeAvatarSettings();
+            
+            // 应用背景
+            applyChatsBackground();
+            // 刷新消息显示 (应用新的头像/昵称)
+            refreshChatMessages();
+        }
+
+        function applyChatsBackground() {
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) return;
+            
+            const bgColor = localStorage.getItem('chat_bg_color') || '#f8f8f8';
+            const bgImage = localStorage.getItem('chat_bg_image') || '';
+            
+            chatMessages.style.backgroundColor = bgColor;
+            if (bgImage) {
+                chatMessages.style.backgroundImage = `url(${bgImage})`;
+                chatMessages.style.backgroundSize = 'cover';
+                chatMessages.style.backgroundPosition = 'center';
+            } else {
+                chatMessages.style.backgroundImage = 'none';
+            }
+        }
+
+        function refreshChatMessages() {
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages.children.length > 0) {
+                // 保存当前消息内容
+                const messages = [];
+                // 遍历所有的 message-bubble
+                for (let i = 0; i < chatMessages.children.length; i++) {
+                    const bubble = chatMessages.children[i];
+                    const messageEl = bubble.querySelector('.message');
+                    // 跳过 "思考中..." 气泡
+                    if (messageEl && !messageEl.classList.contains('thinking')) {
+                        const sender = messageEl.classList.contains('sent') ? 'user' : 'ai';
+                        messages.push({ sender, text: messageEl.textContent });
+                    }
+                }
+                
+                // 清空并重新显示
+                chatMessages.innerHTML = '';
+                messages.forEach(msg => {
+                    // 使用 shouldSave=false 避免二次保存
+                    appendMessage(msg.sender, msg.text, false); 
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            applyChatsBackground();
         }
 
     </script>
