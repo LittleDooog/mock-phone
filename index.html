@@ -55,95 +55,165 @@
         /* 3. 顶部状态栏 */
         .status-bar {
             height: 30px;
-            background-color: #f8f8f8;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.12), rgba(0,0,0,0.03));
             padding: 5px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 12px;
             font-weight: 600;
-            color: #333;
-            border-bottom: 1px solid #ddd;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 100;
         }
+
+        .status-right { display: inline-flex; gap:8px; align-items:center; }
+        .battery { width: 24px; height:11px; border:1px solid white; border-radius:2.5px; position:relative; box-sizing: border-box; display:inline-flex; align-items:center; justify-content: center; padding: 0; overflow: visible; }
+        .battery::after { content: ''; position:absolute; right:-4px; top:50%; transform:translateY(-50%); width:2px; height:5px; background: white; border-radius:0 1px 1px 0; }
+        .battery-level { display:inline-block; height: 7px; background: white; width: 18px; border-radius:1px; }
 
         /* 4. 头部导航 (Home/返回) */
         .header {
-            height: 44px;
+            height: 50px;
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
             padding: 0 15px;
-            background-color: #f8f8f8;
-            border-bottom: 1px solid #ddd;
-            z-index: 10;
-            position: relative; 
-            width: 100%;
-            box-sizing: border-box;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .back-btn {
+            color: #007aff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 12px;
+            user-select: none;
+        }
+        .back-btn:active {
+            opacity: 0.6;
         }
         .header h1 {
-            font-size: 18px;
-            font-weight: 600;
-            flex-grow: 1;
-            text-align: center;
             margin: 0;
-            padding: 0 50px;
-            white-space: nowrap; 
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .back-btn, .home-btn {
             font-size: 16px;
-            color: #007aff;
-            cursor: pointer;
-            z-index: 20; 
-            position: absolute; 
-            left: 15px; 
-            font-weight: 400;
+            font-weight: 700;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #333;
+            pointer-events: none;
         }
-        
-        /* 5. 核心内容区域 (appContainer) */
-        .content {
-            flex-grow: 1; 
-            overflow-y: auto;
-            padding: 20px;
-            background-color: #fff;
-            position: relative;
-        }
-
-        /* APP屏幕无padding，铺满小手机屏幕 */
-        .content.app-mode {
-            padding: 0;
-            overflow: hidden;
-        }
-
-        /* 主屏幕回到正常padding */
-        .content.home-mode {
-            padding: 20px;
-            overflow-y: auto;
-        }
-
         /* 6. 主页图标网格 */
         .app-grid {
-            display: flex;
-            flex-wrap: wrap;
-            padding-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto auto;
+            gap: 12px;
+            padding-top: 8px;
+            align-items: start;
+            overflow: visible;
         }
+        .widget {
+            width: 100%;
+            height: 100%;
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+            background: #eee;
+        }
+        .widget img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .widget.wide { grid-column: 1 / span 4; grid-row: 1; min-height: 32px; margin-top: -10px; }
+        .widget.square { grid-column: span 2; aspect-ratio: 1 / 1; min-height: 38px; }
+        .widget.square.left { grid-column: 1 / span 2; grid-row: 2; }
+        .font-preview {
+            border: 1px dashed #ddd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        .font-input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        .font-sample { font-size: 18px; color: #333; }
         .app-icon {
-            width: 80px;
-            height: 80px;
-            margin: 10px;
+            grid-column: span 1;
+            width: 70px;
+            height: 70px;
+            margin: 0 auto;
             text-align: center;
+            flex-shrink: 0;
             cursor: pointer;
         }
+        /* Grid placement for icons to align with widget layout */
+        #qq-icon { grid-column: 3 !important; grid-row: 2 !important; z-index: 10; align-self: center; width: 60px; height: 60px; margin: -95px 0 0 0 !important; }
+        #qq-icon img { width: 44px; height: 44px; }
+        #qq-icon p { margin: 2px 0 0; font-size: 10px; }
+        #worldbook-icon { grid-column: 4 !important; grid-row: 2 !important; z-index: 10; align-self: center; width: 60px; height: 60px; margin: -95px 0 0 0 !important; }
+        #worldbook-icon img { width: 44px; height: 44px; }
+        #worldbook-icon p { margin: 2px 0 0; font-size: 10px; }
         .app-icon img {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 12px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .app-icon p {
-            margin: 5px 0 0;
-            font-size: 12px;
+            margin: 3px 0 0;
+            font-size: 11px;
             color: #333;
+        }
+        /* Dock 栏 */
+        .dock {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 30px);
+            padding: 10px 14px;
+            border-radius: 26px;
+            background: rgba(255,255,255,0.65);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            z-index: 120;
+        }
+        .dock .app-icon { margin: 0; width: 64px; height: 64px; }
+        .dock .app-icon img { width: 54px; height: 54px; border-radius: 14px; }
+        .dock .app-icon p { color: #333; }
+
+        /* 内容容器填充整个小手机区域 */
+        .content {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        /* APP屏幕无padding，铺满小手机屏幕，强制白色背景 */
+        .content.app-mode {
+            padding: 0;
+            overflow: hidden;
+            font-size: 14px;
+            background-color: #fff !important;
+            background-image: none !important;
+            min-height: 100%;
+        }
+
+        /* 主屏幕回到正常padding */
+        .content.home-mode {
+            padding: 20px 20px 140px 20px;
+            overflow-y: scroll;
+            overflow-x: visible;
         }
 
         /* 7. API 设置页面样式 */
@@ -154,11 +224,12 @@
             overflow: hidden;
             width: 100%;
             height: 100%;
+            background-color: #fff;
         }
         .api-settings label {
             display: block;
-            margin-top: 15px;
-            font-size: 14px;
+            margin-top: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: #333;
         }
@@ -166,8 +237,9 @@
         .api-content {
             flex-grow: 1;
             overflow-y: auto; 
-            padding: 20px;
-            background-color: #fff; 
+            padding: 14px;
+            background-color: #fff;
+            font-size: 13px;
         }
         .api-settings input[type="text"], .api-settings input[type="password"], .api-settings select {
             width: 100%;
@@ -191,6 +263,14 @@
         }
         .save-btn:hover {
             background-color: #0056b3;
+        }
+        /* Beautify 页面操作按钮：收窄宽度与字号，提升观感 */
+        #beautifyScreen .api-content .save-btn {
+            width: auto;
+            min-width: 80px;
+            padding: 8px 14px;
+            font-size: 14px;
+            border-radius: 12px;
         }
         .status-message {
             margin-top: 15px;
@@ -221,6 +301,7 @@
             padding: 0;
             width: 100%;
             height: 100%;
+            background-color: #fff;
         }
         .chat-messages {
             flex-grow: 1;
@@ -572,6 +653,28 @@
             background-color: #f0f0f0;
             color: #333;
         }
+
+        /* 13. 创建世界书和添加内容模态框样式 */
+        #createWorldbookModal, #addWorldbookContentModal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #createWorldbookModal.is-active, #addWorldbookContentModal.is-active {
+            display: flex !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
     </style>
 </head>
 <body>
@@ -579,26 +682,48 @@
     <div class="phone-screen">
         <div class="status-bar">
             <span id="statusTime">9:41 AM</span>
-            <span>LTE</span>
-            <span>🔋 100%</span>
+            <span class="status-right">
+                <span class="battery" title="100%">
+                    <span class="battery-level" style="width:100%"></span>
+                </span>
+            </span>
         </div>
 
         <div id="appContainer" class="content">
             
             <div id="homeScreen">
                 <div class="app-grid">
-                    <div class="app-icon" onclick="showApp('api')">
-                        <img src="https://img.icons8.com/color/96/key.png" alt="API Key Icon" data-app="api">
-                        <p>API</p>
+                    <div class="widget wide">
+                        <img src="https://i.postimg.cc/xdTz1PDb/IMG-4890.jpg" alt="长方形图片">
                     </div>
-                    <div class="app-icon" onclick="showApp('chat')">
-                        <img src="https://img.icons8.com/color/96/speech-bubble--v1.png" alt="聊天图标" data-app="chat">
-                        <p>聊天</p>
+                    <div class="widget square left">
+                        <img src="https://i.postimg.cc/pXb5Fvb3/IMG-4891.jpg" alt="正方形图片1">
                     </div>
-                    <div class="app-icon" onclick="showApp('beautify')">
-                        <img src="https://img.icons8.com/color/96/paint-palette.png" alt="美化图标" data-app="beautifyApp">
-                        <p>美化</p>
+                    <!-- QQ icon -->
+                    <div class="app-icon" id="qq-icon" onclick="showApp('chat')">
+                        <img src="https://i.postimg.cc/VLx3BSZk/IMG-4884.jpg" alt="QQ 图标" data-app="chat">
+                        <p>QQ</p>
                     </div>
+                    <!-- Worldbook icon -->
+                    <div class="app-icon" id="worldbook-icon" onclick="showApp('worldbook')">
+                        <img src="https://i.postimg.cc/bJV5Gd2y/IMG-4883.jpg" alt="世界书图标" data-app="worldbook">
+                        <p>世界书</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dock" class="dock">
+                <div class="app-icon" id="api-icon" onclick="showApp('api')">
+                    <img src="https://i.postimg.cc/5NXVmWxq/IMG-4886.jpg" alt="API 图标" data-app="api">
+                    <p>API</p>
+                </div>
+                <div class="app-icon" id="beautify-icon" onclick="showApp('beautify')">
+                    <img src="https://i.postimg.cc/ZqV7g0H3/IMG-4885.jpg" alt="美化图标" data-app="beautifyApp">
+                    <p>美化</p>
+                </div>
+                <div class="app-icon" id="font-icon" onclick="showApp('font')">
+                    <img src="https://i.postimg.cc/t498M0bK/IMG-4888.jpg" alt="字体图标" data-app="font">
+                    <p>字体</p>
                 </div>
             </div>
 
@@ -646,8 +771,10 @@
                     <select id="targetAppSelect">
                         <option value="home-bg">手机背景</option>
                         <option value="api">API 图标</option>
-                        <option value="chat">聊天 图标</option>
+                        <option value="chat">QQ 图标</option>
                         <option value="beautifyApp">美化 APP 图标</option>
+                        <option value="worldbook">世界书 图标</option>
+                        <option value="font">字体 图标</option>
                     </select>
 
                     <label for="iconUrl" style="margin-top: 15px;">图标图片 URL:</label>
@@ -657,6 +784,7 @@
                         <button class="save-btn" onclick="applyAndSaveBeautify()">应用并保存</button>
                         <button class="save-btn" style="background:#6c757d;" onclick="previewBeautify(true)">预览</button>
                         <button class="save-btn" style="background:#adb5bd;" onclick="previewBeautify(false)">取消预览</button>
+                        <button class="save-btn" style="background:#e53e3e;" onclick="restoreBeautifyDefaults()">恢复默认</button>
                     </div>
 
                     <div id="beautifyPreview" style="margin-top:20px; display:flex; gap:12px; align-items:center;">
@@ -669,6 +797,46 @@
                         </div>
                     </div>
                     <div id="beautifyStatus" class="status-message" style="margin-top:20px;">当前状态: 未保存</div>
+
+                    <hr style="margin:20px 0; border:none; border-top:1px solid #eee;">
+                    <div style="font-weight:700; margin-bottom:8px;">聊天页自定义背景</div>
+                    <label for="beautifyChatBgColor">聊天背景色:</label>
+                    <input type="color" id="beautifyChatBgColor" value="#f8f8f8" style="width: 60px; height: 36px; padding: 0; border: none; background: transparent;">
+
+                    <label for="beautifyChatBgImage" style="margin-top: 12px;">聊天背景图 URL（可选）:</label>
+                    <input type="text" id="beautifyChatBgImage" placeholder="例如: https://example.com/chat-bg.jpg 或 data:...">
+
+                    <div style="margin-top: 12px; display:flex; gap:10px; align-items:center; flex-wrap: wrap;">
+                        <button class="save-btn" onclick="previewBeautifyChatBackground()" style="min-width:110px;">预览聊天背景</button>
+                        <button class="save-btn" onclick="saveBeautifyChatBackground()" style="min-width:110px;">保存聊天背景</button>
+                        <button class="save-btn" onclick="resetBeautifyChatBackground()" style="background:#ccc; color:#000; min-width:110px;">恢复默认</button>
+                    </div>
+                    <div style="color:#888; font-size:12px; margin-top:8px;">提示：预览需进入“聊天”页查看效果；保存后将对所有聊天生效。</div>
+                </div>
+            </div>
+
+            <div id="fontScreen" class="api-settings" style="display:none;">
+                <div class="header">
+                    <span class="back-btn" onclick="showHomeScreen()">返回</span>
+                    <h1>字体</h1>
+                </div>
+                <div class="api-content">
+                    <label style="font-weight:700;">本地字体文件（可选，优先）</label>
+                    <input id="fontFileInput" type="file" accept=".woff,.woff2,.ttf,.otf" onchange="handleFontFileSelection(event)" style="margin-top:8px;" />
+
+                    <label style="font-weight:700; margin-top:12px; display:block;">或字体 URL</label>
+                    <input id="fontUrlInput" class="font-input" type="text" placeholder="https://.../yourfont.ttf" style="margin-top:8px;" />
+
+                    <div style="display:flex; gap:8px; margin-top:12px;">
+                        <button class="save-btn" style="flex:1;" onclick="previewFont()">预览</button>
+                        <button class="save-btn" style="flex:1;" onclick="saveFontAndApply()">保存并应用</button>
+                        <button class="save-btn" style="flex:1; background:#ccc; color:#000;" onclick="clearFont()">清除</button>
+                    </div>
+
+                    <div id="fontPreview" class="font-preview">
+                        <div id="fontPreviewText" class="font-sample">示例：天地玄黄，宇宙洪荒</div>
+                    </div>
+                    <div id="fontStatus" style="margin-top:10px; color:#666; font-size:13px;"></div>
                 </div>
             </div>
 
@@ -717,11 +885,65 @@
                 </div>
             </div>
 
+            <div id="worldbookListScreen" class="chat-container" style="display:none;">
+                <div class="header">
+                    <span class="back-btn" onclick="showHomeScreen()">返回</span>
+                    <h1>世界书</h1>
+                    <span class="add-role-btn" onclick="showCreateWorldbookModal()">➕</span>
+                </div>
+                <div id="worldbookList" class="content role-list-content">
+                    <div style="text-align: center; color: #888; margin-top: 50px;">
+                        暂无世界书，请点击右上角 ➕ 创建。
+                    </div>
+                </div>
+            </div>
+
+            <div id="worldbookDetailScreen" class="chat-container" style="display:none;">
+                <div class="header">
+                    <span class="back-btn" onclick="showApp('worldbook')">返回</span>
+                    <h1 id="worldbookDetailTitle">世界书</h1>
+                </div>
+                <div id="worldbookContent" class="content" style="background-color: #fff; overflow-y: auto; padding: 15px; flex-grow: 1;">
+                    <div id="worldbookContentList"></div>
+                </div>
+                <div style="padding: 10px; background-color: #fff; border-top: 1px solid #ddd;">
+                    <button onclick="showAddWorldbookContentModal()" style="width: 100%; padding: 12px; background-color: #007aff; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">添加内容</button>
+                </div>
+            </div>
+
         </div> <div id="roleActionMenu" style="display: none;">
             <div id="menuContent" class="menu-content">
                 <button id="clearHistoryBtn" onclick="confirmClearHistory()" style="color: #ff9500;">清空聊天记录</button>
                 <button id="deleteRoleBtn" onclick="confirmDeleteRole()">删除角色</button>
                 <button onclick="hideRoleActionMenu()">取消</button>
+            </div>
+        </div>
+
+        <div id="createWorldbookModal" style="display: none;" onclick="event.target.id === 'createWorldbookModal' && closeCreateWorldbookModal();">
+            <div class="avatar-modal-content" style="max-width: 300px;">
+                <h3>创建世界书</h3>
+                <div class="avatar-section">
+                    <label>世界书名称</label>
+                    <input type="text" id="worldbookNameInput" placeholder="输入世界书名称..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; margin-bottom: 15px;">
+                </div>
+                <div class="avatar-modal-buttons">
+                    <button class="save" onclick="createWorldbook()">确定</button>
+                    <button class="cancel" onclick="closeCreateWorldbookModal()">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="addWorldbookContentModal" style="display: none;" onclick="event.target.id === 'addWorldbookContentModal' && closeAddWorldbookContentModal();">
+            <div class="avatar-modal-content" style="max-width: 300px;">
+                <h3>添加内容</h3>
+                <div class="avatar-section">
+                    <label>内容文本</label>
+                    <textarea id="worldbookContentInput" placeholder="输入世界书内容..." rows="6" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; margin-bottom: 15px; resize: none;"></textarea>
+                </div>
+                <div class="avatar-modal-buttons">
+                    <button class="save" onclick="addWorldbookContent()">确定</button>
+                    <button class="cancel" onclick="closeAddWorldbookContentModal()">取消</button>
+                </div>
             </div>
         </div>
 
@@ -780,6 +1002,41 @@
                     <div class="avatar-section" style="font-size: 12px; color: #999;">
                         提示：颜色和图片都设置时，图片优先显示
                     </div>
+                    
+                    <div class="avatar-section" style="border-top:1px solid #f0f0f0; padding-top:12px;">
+                        <label>聊天气泡主题</label>
+                        <div id="bubbleThemeList" style="display:flex; flex-direction:column; gap:8px;">
+                            <label style="display:flex; align-items:center; gap:8px;">
+                                <input type="radio" name="bubbleTheme" value="pink-yellow">
+                                <span>粉黄（对方 粉色 / 我 黄色）</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px;">
+                                <input type="radio" name="bubbleTheme" value="deep-blue">
+                                <span>深蓝（对方 浅蓝 / 我 深蓝）</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px;">
+                                <input type="radio" name="bubbleTheme" value="green-gray">
+                                <span>绿灰（对方 绿色 / 我 灰色）</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px;">
+                                <input type="radio" name="bubbleTheme" value="classic">
+                                <span>经典（对方 灰 / 我 蓝）</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>自定义 CSS（用于气泡或界面样式）</label>
+                        <textarea id="customBubbleCss" placeholder="在此输入自定义 CSS，例如 .message.received{background:#fce4ec;}" style="width:100%; height:80px; padding:8px; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; font-size:12px;"></textarea>
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>字体大小</label>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <input type="range" id="chatFontSize" min="12" max="24" value="14" style="flex:1;">
+                            <div id="chatFontSizeDisplay" style="width:36px; text-align:center; font-size:12px; color:#333;">14px</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="roleTab" class="settings-tab-content">
@@ -797,6 +1054,44 @@
                         <label>模型</label>
                         <select id="editRoleModel" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; margin-bottom: 8px;"></select>
                     </div>
+
+                    <div class="avatar-section">
+                        <label>关联世界书</label>
+                        <div id="worldbookSelectorContainer" style="background-color: #f9f9f9; padding: 10px; border-radius: 8px; max-height: 200px; overflow-y: auto; border: 1px solid #eee;">
+                            <!-- 世界书将在此以滚动勾选方式显示（仅显示书名） -->
+                        </div>
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>启用独立后台活动</label>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <input type="checkbox" id="enableIndependentBackground">
+                            <span style="font-size:12px; color:#666;">开启后 AI 可在后台单独执行任务</span>
+                        </div>
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>独立行动冷却（分钟）</label>
+                        <input type="number" id="independentCooldown" min="0" value="0" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box;">
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>短期记忆条数</label>
+                        <input type="number" id="shortTermMemoryCount" min="0" value="0" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box;">
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>自动总结长期记忆</label>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <input type="checkbox" id="autoSummarizeLongTerm">
+                            <span style="font-size:12px; color:#666;">开启后系统会自动总结并压缩长期记忆</span>
+                        </div>
+                    </div>
+
+                    <div class="avatar-section">
+                        <label>自动总结间隔（条）</label>
+                        <input type="number" id="autoSummarizeInterval" min="1" value="10" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; box-sizing:border-box;">
+                    </div>
                 </div>
 
                 <div class="avatar-modal-buttons">
@@ -813,12 +1108,17 @@
             home: document.getElementById('homeScreen'),
             api: document.getElementById('apiScreen'),
             beautify: document.getElementById('beautifyScreen'),
+            font: document.getElementById('fontScreen'),
             roleList: document.getElementById('roleListScreen'),
             roleManager: document.getElementById('roleManagerScreen'),
-            chatDetail: document.getElementById('chatDetailScreen')
+            chatDetail: document.getElementById('chatDetailScreen'),
+            worldbook: document.getElementById('worldbookListScreen'),
+            worldbookDetail: document.getElementById('worldbookDetailScreen')
         };
         let roles = [];
         let currentRoleId = null;
+        let worldbooks = [];
+        let currentWorldbookId = null;
         
         // 初始加载：读取本地存储
         window.onload = function() {
@@ -846,14 +1146,113 @@
             }
             
             roles = JSON.parse(localStorage.getItem('roles') || '[]');
-            loadRoleList(); 
+            worldbooks = JSON.parse(localStorage.getItem('worldbooks') || '[]');
+            loadRoleList();
+            loadWorldbookList();
             loadBeautifySettings();
+            // 应用气泡主题与字体（全局）
+            applyChatTheme();
+            applyChatFontSize();
+            // 应用自定义字体（如果有）
+            applyFont();
             // 初始化：主屏幕添加 home-mode class
             document.getElementById('appContainer').classList.add('home-mode');
             // 启动时钟并每分钟更新一次
             updateClock();
             setInterval(updateClock, 60000);
         };
+
+        // 在小手机内部显示短消息替代浏览器 alert（自适应手机宽度）
+        function showPhoneAlert(msg, timeout = 2500) {
+            let existing = document.getElementById('phoneAlert');
+            if (existing) existing.remove();
+            const alertEl = document.createElement('div');
+            alertEl.id = 'phoneAlert';
+            alertEl.style.position = 'absolute';
+            alertEl.style.left = '50%';
+            alertEl.style.bottom = '30px';
+            alertEl.style.transform = 'translateX(-50%)';
+            alertEl.style.maxWidth = '320px';
+            alertEl.style.width = '80%';
+            alertEl.style.padding = '10px 14px';
+            alertEl.style.background = 'rgba(0,0,0,0.8)';
+            alertEl.style.color = '#fff';
+            alertEl.style.borderRadius = '12px';
+            alertEl.style.fontSize = '14px';
+            alertEl.style.textAlign = 'center';
+            alertEl.style.zIndex = '9999';
+            alertEl.textContent = msg;
+            document.querySelector('.phone-screen').appendChild(alertEl);
+            if (timeout > 0) setTimeout(() => { alertEl.remove(); }, timeout);
+        }
+
+        // ----- IndexedDB 辅助：存取字体 Blob -----
+        function openFontDB() {
+            return new Promise((resolve, reject) => {
+                try {
+                    const req = indexedDB.open('SmallPhoneFonts', 1);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('fonts')) db.createObjectStore('fonts');
+                    };
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    req.onerror = (e) => reject(e.target.error);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        async function saveFontBlobToIDB(key, blob) {
+            const db = await openFontDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('fonts', 'readwrite');
+                const store = tx.objectStore('fonts');
+                const req = store.put(blob, key);
+                req.onsuccess = () => resolve(true);
+                req.onerror = () => reject(req.error || new Error('IDB put failed'));
+            });
+        }
+
+        async function getFontBlobFromIDB(key) {
+            try {
+                const db = await openFontDB();
+                return await new Promise((resolve, reject) => {
+                    const tx = db.transaction('fonts', 'readonly');
+                    const store = tx.objectStore('fonts');
+                    const req = store.get(key);
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => reject(req.error || new Error('IDB get failed'));
+                });
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function deleteFontFromIDB(key) {
+            try {
+                const db = await openFontDB();
+                return await new Promise((resolve, reject) => {
+                    const tx = db.transaction('fonts', 'readwrite');
+                    const store = tx.objectStore('fonts');
+                    const req = store.delete(key);
+                    req.onsuccess = () => resolve(true);
+                    req.onerror = () => reject(req.error || new Error('IDB delete failed'));
+                });
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function dataURLToBlob(dataurl) {
+            const arr = dataurl.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8 = new Uint8Array(n);
+            while (n--) u8[n] = bstr.charCodeAt(n);
+            return new Blob([u8], { type: mime });
+        }
 
         // 2. 屏幕切换函数
         function showScreen(screenName) {
@@ -866,16 +1265,35 @@
 
         function showHomeScreen() {
             // 恢复为主屏幕并显示状态栏
-            document.getElementById('homeScreen').style.display = 'flex';
+            screens['home'].style.display = 'flex';
             screens['api'].style.display = 'none';
+            screens['font'].style.display = 'none';
             screens['roleList'].style.display = 'none';
             screens['roleManager'].style.display = 'none';
             screens['chatDetail'].style.display = 'none';
             screens['beautify'].style.display = 'none';
+            screens['worldbook'].style.display = 'none';
+            screens['worldbookDetail'].style.display = 'none';
             document.querySelector('.status-bar').classList.remove('hidden');
             document.getElementById('appContainer').classList.remove('app-mode');
             document.getElementById('appContainer').classList.add('home-mode');
+            const dock = document.getElementById('dock');
+            if (dock) dock.style.display = 'flex';
+            
+            // 确保内容背景正确显示
+            const bg = localStorage.getItem('beautify_background');
+            if (bg) {
+                document.getElementById('appContainer').style.background = 'transparent';
+                document.getElementById('appContainer').style.backgroundImage = 'none';
+            } else {
+                document.getElementById('appContainer').style.background = '#fff';
+                document.getElementById('appContainer').style.backgroundImage = 'none';
+            }
+            
             currentScreen = 'home';
+
+            // 恢复手机壁纸（主屏显示壁纸）
+            try { loadBeautifySettings(); } catch (e) {}
         }
         
         function showApp(appName) {
@@ -884,15 +1302,41 @@
                 document.querySelector('.status-bar').classList.add('hidden');
                 document.getElementById('appContainer').classList.add('app-mode');
                 document.getElementById('appContainer').classList.remove('home-mode');
+                // 强制APP容器背景为白色
+                document.getElementById('appContainer').style.background = '#ffffff';
+                document.getElementById('appContainer').style.backgroundImage = 'none';
+                // 进入 APP 时禁用手机壁纸，避免边缘透出
+                const phone = document.querySelector('.phone-screen');
+                if (phone) {
+                    phone.style.backgroundImage = 'none';
+                    phone.style.backgroundColor = '#ffffff';
+                }
+                const dock = document.getElementById('dock');
+                if (dock) dock.style.display = 'none';
             }
 
             screens['home'].style.display = 'none';
             screens['api'].style.display = 'none';
+            screens['font'].style.display = 'none';
             screens['roleList'].style.display = 'none';
             screens['roleManager'].style.display = 'none';
             screens['chatDetail'].style.display = 'none';
             screens['beautify'].style.display = 'none';
-            
+            screens['worldbook'].style.display = 'none';
+            screens['worldbookDetail'].style.display = 'none';
+
+            // 强制所有内容区域为白色背景
+            document.querySelectorAll('.content, .api-settings, .chat-container').forEach(c => {
+                c.style.background = '#ffffff !important';
+                c.style.backgroundImage = 'none !important';
+            });
+            // 也确保消息区是白底（若存在）
+            const chatMessagesEl = document.getElementById('chatMessages');
+            if (chatMessagesEl) {
+                chatMessagesEl.style.background = '#f8f8f8';
+                chatMessagesEl.style.backgroundImage = 'none';
+            }
+
             if (appName === 'roleList') {
                 screens['roleList'].style.display = 'flex';
                 loadRoleList(); 
@@ -903,7 +1347,7 @@
                 screens['chatDetail'].style.display = 'flex';
                 const chatMessages = document.getElementById('chatMessages');
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-                // 确保聊天背景在加载完成后应用
+                // 确保聊天背景在加载完成后应用（但因为我们在聊天界面强制白底，这里延迟应用也不会覆盖白色）
                 setTimeout(() => applyChatsBackground(), 50);
             } else if (appName === 'beautify') {
                 screens['beautify'].style.display = 'flex';
@@ -915,10 +1359,34 @@
                 document.getElementById('backgroundUrl').value = bg;
                 document.getElementById('iconUrl').value = '';
                 document.getElementById('beautifyStatus').textContent = '当前状态: 未保存';
+                // 填充聊天背景设置
+                const chatBgColor = localStorage.getItem('chat_bg_color') || '#f8f8f8';
+                const chatBgImage = localStorage.getItem('chat_bg_image') || '';
+                const c1 = document.getElementById('beautifyChatBgColor');
+                const c2 = document.getElementById('beautifyChatBgImage');
+                if (c1) c1.value = chatBgColor;
+                if (c2) c2.value = chatBgImage;
+            } else if (appName === 'font') {
+                // 打开字体设置页面
+                screens['font'].style.display = 'flex';
+                const saved = localStorage.getItem('custom_font_url') || '';
+                const input = document.getElementById('fontUrlInput');
+                if (input) input.value = saved;
+                // 更新预览
+                try { previewFont(); } catch (e) { /* ignore */ }
             } else if (appName === 'api') {
                 screens['api'].style.display = 'flex';
             } else if (appName === 'chat') { 
                 showApp('roleList');
+            } else if (appName === 'worldbook') {
+                screens['worldbook'].style.display = 'flex';
+                loadWorldbookList();
+            } else if (appName === 'worldbookDetail') {
+                screens['worldbookDetail'].style.display = 'flex';
+                loadWorldbookDetail();
+            } else if (!appName || appName === 'home') {
+                const dock = document.getElementById('dock');
+                if (dock) dock.style.display = 'flex';
             }
         }
         
@@ -1075,31 +1543,47 @@
         function loadBeautifySettings() {
             const phone = document.querySelector('.phone-screen');
             const bg = localStorage.getItem('beautify_background');
+            const defaultBg = 'https://i.postimg.cc/K8K84gkL/IMG-4887.jpg';
             if (bg) {
                 phone.style.backgroundImage = `url(${bg})`;
                 phone.style.backgroundSize = 'cover';
                 phone.style.backgroundPosition = 'center';
             } else {
-                phone.style.backgroundImage = '';
+                phone.style.backgroundImage = `url(${defaultBg})`;
+                phone.style.backgroundSize = 'cover';
+                phone.style.backgroundPosition = 'center';
             }
 
-            // 如果设置了背景，则将内部 content 区域背景设为透明以显示背景图
+            // 如果设置了背景（包括默认背景），将内部 content 区域背景设为透明以显示背景图
             const contents = document.querySelectorAll('.content');
-            if (bg) {
+            if (phone.style.backgroundImage && phone.style.backgroundImage !== '') {
                 contents.forEach(c => c.style.background = 'transparent');
             } else {
                 contents.forEach(c => c.style.background = '#fff');
             }
 
+            const defaultIcons = {
+                api: 'https://i.postimg.cc/5NXVmWxq/IMG-4886.jpg',
+                chat: 'https://i.postimg.cc/VLx3BSZk/IMG-4884.jpg',
+                worldbook: 'https://i.postimg.cc/bJV5Gd2y/IMG-4883.jpg',
+                beautifyApp: 'https://i.postimg.cc/ZqV7g0H3/IMG-4885.jpg',
+                font: 'https://i.postimg.cc/t498M0bK/IMG-4888.jpg'
+            };
+
             const applyIcon = (dataApp, key) => {
                 const img = document.querySelector(`.app-icon img[data-app="${dataApp}"]`);
                 const saved = localStorage.getItem(key);
-                if (img && saved) img.src = saved;
+                if (img) {
+                    if (saved) img.src = saved;
+                    else if (defaultIcons[dataApp]) img.src = defaultIcons[dataApp];
+                }
             };
 
             applyIcon('api', 'beautify_icon_api');
             applyIcon('chat', 'beautify_icon_chat');
             applyIcon('beautifyApp', 'beautify_icon_beautifyApp');
+            applyIcon('worldbook', 'beautify_icon_worldbook');
+            applyIcon('font', 'beautify_icon_font');
         }
 
         // 6.2 状态栏时钟：更新主屏幕左上角时间
@@ -1165,6 +1649,70 @@
             document.getElementById('beautifyStatus').style.color = 'green';
             document.getElementById('beautifyStatus').textContent = '当前状态: 保存成功！';
             alert('已保存美化设置');
+        }
+
+        // 恢复默认美化设置：删除自定义背景和图标设置，恢复内置默认
+        function restoreBeautifyDefaults() {
+            const keys = [
+                'beautify_background',
+                'beautify_icon_api',
+                'beautify_icon_chat',
+                'beautify_icon_beautifyApp',
+                'beautify_icon_worldbook',
+                'beautify_icon_font'
+            ];
+            keys.forEach(k => localStorage.removeItem(k));
+            // 清空输入框
+            const bgInput = document.getElementById('backgroundUrl'); if (bgInput) bgInput.value = '';
+            const iconInput = document.getElementById('iconUrl'); if (iconInput) iconInput.value = '';
+            // 重新应用默认样式
+            loadBeautifySettings();
+            document.getElementById('beautifyStatus').style.color = 'orange';
+            document.getElementById('beautifyStatus').textContent = '已恢复默认美化';
+            showPhoneAlert('已恢复默认美化');
+        }
+
+        // —— 美化页：聊天背景设置 ——
+        function previewBeautifyChatBackground() {
+            const color = (document.getElementById('beautifyChatBgColor')?.value || '#f8f8f8');
+            const image = (document.getElementById('beautifyChatBgImage')?.value || '').trim();
+            const chat = document.getElementById('chatMessages');
+            if (!chat) {
+                showPhoneAlert('请先进入“聊天”页查看预览');
+                return;
+            }
+            chat.style.backgroundColor = color || '#f8f8f8';
+            if (image) {
+                chat.style.backgroundImage = `url(${image})`;
+                chat.style.backgroundSize = 'cover';
+                chat.style.backgroundPosition = 'center';
+            } else {
+                chat.style.backgroundImage = 'none';
+            }
+            document.getElementById('beautifyStatus').style.color = 'gray';
+            document.getElementById('beautifyStatus').textContent = '已预览聊天背景（未保存）';
+        }
+
+        function saveBeautifyChatBackground() {
+            const color = (document.getElementById('beautifyChatBgColor')?.value || '#f8f8f8');
+            const image = (document.getElementById('beautifyChatBgImage')?.value || '').trim();
+            localStorage.setItem('chat_bg_color', color);
+            localStorage.setItem('chat_bg_image', image);
+            try { applyChatsBackground(); } catch (e) {}
+            document.getElementById('beautifyStatus').style.color = 'green';
+            document.getElementById('beautifyStatus').textContent = '当前状态: 已保存聊天背景！';
+            showPhoneAlert('已保存聊天背景设置');
+        }
+
+        function resetBeautifyChatBackground() {
+            localStorage.removeItem('chat_bg_color');
+            localStorage.removeItem('chat_bg_image');
+            try { applyChatsBackground(); } catch (e) {}
+            const c1 = document.getElementById('beautifyChatBgColor'); if (c1) c1.value = '#f8f8f8';
+            const c2 = document.getElementById('beautifyChatBgImage'); if (c2) c2.value = '';
+            document.getElementById('beautifyStatus').style.color = 'orange';
+            document.getElementById('beautifyStatus').textContent = '聊天背景已恢复默认';
+            showPhoneAlert('已恢复聊天背景默认');
         }
         
         // --- 角色管理逻辑 ---
@@ -1501,7 +2049,30 @@
                  return;
             }
             const model = role.model; 
-            const systemPrompt = role.prompt;
+            let systemPrompt = role.prompt;
+            
+            // 添加关联的世界书内容到系统提示词
+            if (role.associatedWorldbooks && role.associatedWorldbooks.length > 0) {
+                worldbooks = JSON.parse(localStorage.getItem('worldbooks') || '[]');
+                const selectedWorldbooks = worldbooks.filter(wb => role.associatedWorldbooks.includes(wb.id));
+                if (selectedWorldbooks.length > 0) {
+                    const worldbookContent = selectedWorldbooks
+                        .map(wb => wb.content.join('\n'))
+                        .join('\n\n');
+                    systemPrompt += '\n\n【世界书内容】\n' + worldbookContent;
+                }
+            }
+
+            // 强制性的角色运行设置（将这些设定以指令形式添加到系统提示词，要求 AI 遵循）
+            const enforceLines = [];
+            enforceLines.push('请遵循以下角色运行设定并在响应中体现：');
+            enforceLines.push('启用独立后台活动: ' + (role.enableIndependentBackground ? '是' : '否'));
+            enforceLines.push('独立行动冷却（分钟）: ' + (role.independentCooldown !== undefined ? role.independentCooldown : 0));
+            enforceLines.push('短期记忆条数: ' + (role.shortTermMemoryCount !== undefined ? role.shortTermMemoryCount : 0));
+            enforceLines.push('自动总结长期记忆: ' + (role.autoSummarizeLongTerm ? '是' : '否'));
+            enforceLines.push('自动总结间隔（条）: ' + (role.autoSummarizeInterval !== undefined ? role.autoSummarizeInterval : 0));
+            enforceLines.push('\n请严格遵守以上设置，在回复和内部行为上执行并在必要时给出简短说明以证明遵循。');
+            systemPrompt += '\n\n【角色运行设置】\n' + enforceLines.join('\n');
             
             appendMessage('user', messageText);
             input.value = '';
@@ -1624,6 +2195,14 @@
             const chatBgImage = localStorage.getItem('chat_bg_image') || '';
             document.getElementById('chatBgColor').value = chatBgColor;
             document.getElementById('chatBgImage').value = chatBgImage;
+            // 加载聊天气泡主题与自定义样式
+            const bubbleTheme = localStorage.getItem('chat_bubble_theme') || 'classic';
+            const radios = document.querySelectorAll('input[name="bubbleTheme"]');
+            radios.forEach(r => { r.checked = (r.value === bubbleTheme); });
+            document.getElementById('customBubbleCss').value = localStorage.getItem('chat_bubble_custom_css') || '';
+            const fontSize = parseInt(localStorage.getItem('chat_font_size') || '14', 10);
+            document.getElementById('chatFontSize').value = fontSize;
+            document.getElementById('chatFontSizeDisplay').textContent = fontSize + 'px';
             // 加载角色设置
             if (currentRoleId) {
                 const role = roles.find(r => r.id === currentRoleId);
@@ -1657,11 +2236,35 @@
                     }
                     
                     editRoleModel.value = role.model;
+                    
+                    // 加载世界书选择器
+                    loadWorldbookSelectorsForRole(role);
+
+                    // 加载自定义的角色运行设置
+                    document.getElementById('enableIndependentBackground').checked = !!role.enableIndependentBackground;
+                    document.getElementById('independentCooldown').value = (role.independentCooldown !== undefined) ? role.independentCooldown : 0;
+                    document.getElementById('shortTermMemoryCount').value = (role.shortTermMemoryCount !== undefined) ? role.shortTermMemoryCount : 0;
+                    document.getElementById('autoSummarizeLongTerm').checked = !!role.autoSummarizeLongTerm;
+                    document.getElementById('autoSummarizeInterval').value = (role.autoSummarizeInterval !== undefined) ? role.autoSummarizeInterval : 10;
                 }
             }
             
             modal.style.display = 'flex';
             modal.classList.add('is-active');
+            // 绑定预览交互（不保存，仅实时预览）
+            try {
+                const fontSlider = document.getElementById('chatFontSize');
+                const fontDisplay = document.getElementById('chatFontSizeDisplay');
+                if (fontSlider) {
+                    fontSlider.oninput = function() { fontDisplay.textContent = this.value + 'px'; previewBubbleAndFont(); };
+                }
+                const radios = document.querySelectorAll('input[name="bubbleTheme"]');
+                radios.forEach(r => { r.onchange = previewBubbleAndFont; });
+                const cssArea = document.getElementById('customBubbleCss');
+                if (cssArea) cssArea.oninput = previewBubbleAndFont;
+                // 初始预览
+                previewBubbleAndFont();
+            } catch (e) { console.warn('预览绑定失败', e); }
         }
 
         function switchSettingsTab(tabName) {
@@ -1694,6 +2297,9 @@
         function closeAvatarSettings() {
             const modal = document.getElementById('avatarSettingsModal');
             modal.classList.remove('is-active');
+            // 移除预览样式（如果有）
+            const prev = document.getElementById('previewBubbleStyle');
+            if (prev) prev.remove();
             // 不立即隐藏display，等待动画完成
             setTimeout(() => {
                 if (!modal.classList.contains('is-active')) {
@@ -1757,6 +2363,43 @@
             }
         }
 
+        function loadWorldbookSelectorsForRole(role) {
+            const container = document.getElementById('worldbookSelectorContainer');
+            worldbooks = JSON.parse(localStorage.getItem('worldbooks') || '[]');
+            
+            container.innerHTML = '';
+            
+            if (worldbooks.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; font-size: 12px;">暂无世界书，请先创建。</p>';
+                return;
+            }
+            
+            // 获取角色已关联的世界书
+            const associatedWorldbooks = role.associatedWorldbooks || [];
+            
+            worldbooks.forEach(worldbook => {
+                // 为每个世界书创建一个复选框项
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.style.cssText = 'display: flex; align-items: center; margin-bottom: 10px; padding: 8px; border-radius: 6px; background-color: #fff; border: 1px solid #eee;';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `worldbook_${worldbook.id}`;
+                checkbox.style.cssText = 'margin-right: 10px; cursor: pointer; width: 18px; height: 18px;';
+                checkbox.dataset.worldbookId = worldbook.id;
+                checkbox.checked = associatedWorldbooks.includes(worldbook.id);
+                
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.style.cssText = 'font-size: 14px; color: #333; cursor: pointer; flex: 1; margin: 0;';
+                label.textContent = `${worldbook.name} (${worldbook.content.length})`;
+                
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(label);
+                container.appendChild(checkboxDiv);
+            });
+        }
+
         function saveAllSettings() {
             // 保存头像
             const userValue = document.getElementById('userAvatarUrl').value.trim();
@@ -1801,6 +2444,15 @@
             const chatBgImage = document.getElementById('chatBgImage').value.trim();
             localStorage.setItem('chat_bg_color', chatBgColor);
             localStorage.setItem('chat_bg_image', chatBgImage);
+
+            // 保存聊天气泡主题与自定义样式及字体大小
+            const selectedThemeEl = document.querySelector('input[name="bubbleTheme"]:checked');
+            const selectedTheme = selectedThemeEl ? selectedThemeEl.value : 'classic';
+            localStorage.setItem('chat_bubble_theme', selectedTheme);
+            const customCss = document.getElementById('customBubbleCss').value || '';
+            localStorage.setItem('chat_bubble_custom_css', customCss);
+            const fontSizeVal = parseInt(document.getElementById('chatFontSize').value) || 14;
+            localStorage.setItem('chat_font_size', String(fontSizeVal));
             
             // 保存角色设置
             if (currentRoleId) {
@@ -1813,11 +2465,33 @@
                     return;
                 }
                 
+                // 保存关联的世界书
+                const associatedWorldbooks = [];
+                const worldbookCheckboxes = document.querySelectorAll('#worldbookSelectorContainer input[type="checkbox"]');
+                worldbookCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        associatedWorldbooks.push(checkbox.dataset.worldbookId);
+                    }
+                });
+
+                // 读取并保存其他运行设定
+                const enableIndependentBackground = !!document.getElementById('enableIndependentBackground').checked;
+                const independentCooldown = parseInt(document.getElementById('independentCooldown').value) || 0;
+                const shortTermMemoryCount = parseInt(document.getElementById('shortTermMemoryCount').value) || 0;
+                const autoSummarizeLongTerm = !!document.getElementById('autoSummarizeLongTerm').checked;
+                const autoSummarizeInterval = parseInt(document.getElementById('autoSummarizeInterval').value) || 0;
+
                 const roleIndex = roles.findIndex(r => r.id === currentRoleId);
                 if (roleIndex > -1) {
                     roles[roleIndex].name = newName;
                     roles[roleIndex].prompt = newPrompt;
                     roles[roleIndex].model = newModel;
+                    roles[roleIndex].associatedWorldbooks = associatedWorldbooks;
+                    roles[roleIndex].enableIndependentBackground = enableIndependentBackground;
+                    roles[roleIndex].independentCooldown = independentCooldown;
+                    roles[roleIndex].shortTermMemoryCount = shortTermMemoryCount;
+                    roles[roleIndex].autoSummarizeLongTerm = autoSummarizeLongTerm;
+                    roles[roleIndex].autoSummarizeInterval = autoSummarizeInterval;
                     localStorage.setItem('roles', JSON.stringify(roles));
                     // 如果有昵称则显示昵称，否则显示新的角色名称
                     const aiNickname = localStorage.getItem('chat_ai_nickname') || '';
@@ -1831,6 +2505,9 @@
             
             // 应用背景
             applyChatsBackground();
+            // 应用气泡主题与字体
+            applyChatTheme();
+            applyChatFontSize();
             // 刷新消息显示 (应用新的头像/昵称)
             refreshChatMessages();
         }
@@ -1850,6 +2527,453 @@
             } else {
                 chatMessages.style.backgroundImage = 'none';
             }
+        }
+
+        // 应用聊天气泡主题（基于预设或自定义 CSS）
+        function applyChatTheme() {
+            // 移除之前注入的自定义样式或预览样式
+            const existing = document.getElementById('customBubbleStyle');
+            if (existing) existing.remove();
+            const prevPreview = document.getElementById('previewBubbleStyle');
+            if (prevPreview) prevPreview.remove();
+
+            const theme = localStorage.getItem('chat_bubble_theme') || 'classic';
+            const customCss = localStorage.getItem('chat_bubble_custom_css') || '';
+
+            if (customCss && customCss.trim().length > 0) {
+                const style = document.createElement('style');
+                style.id = 'customBubbleStyle';
+                style.textContent = customCss;
+                document.head.appendChild(style);
+                return;
+            }
+
+            // 否则应用内置主题
+            let receivedBg = '#e5e5ea';
+            let sentBg = '#007aff';
+            let receivedColor = '#000';
+            let sentColor = '#fff';
+
+            if (theme === 'pink-yellow') {
+                receivedBg = '#f8bbd0'; // pink
+                sentBg = '#fff59d'; // yellow
+                receivedColor = '#000';
+                sentColor = '#000';
+            } else if (theme === 'deep-blue') {
+                receivedBg = '#d6e9ff';
+                sentBg = '#1e3a8a';
+                receivedColor = '#000';
+                sentColor = '#fff';
+            } else if (theme === 'green-gray') {
+                receivedBg = '#dcedc8';
+                sentBg = '#bdbdbd';
+                receivedColor = '#000';
+                sentColor = '#000';
+            } else { // classic
+                receivedBg = '#e5e5ea';
+                sentBg = '#007aff';
+                receivedColor = '#000';
+                sentColor = '#fff';
+            }
+
+            // 设置 CSS 变量或直接注入样式
+            const style = document.createElement('style');
+            style.id = 'customBubbleStyle';
+            style.textContent = `
+                .message.received { background: ${receivedBg} !important; color: ${receivedColor} !important; }
+                .message.sent { background: ${sentBg} !important; color: ${sentColor} !important; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // 应用聊天字体大小
+        function applyChatFontSize() {
+            const size = parseInt(localStorage.getItem('chat_font_size') || '14', 10);
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                chatMessages.style.fontSize = size + 'px';
+            }
+            // 也更新现有消息的样式
+            document.querySelectorAll('.message').forEach(m => m.style.fontSize = size + 'px');
+        }
+
+        // 预览（基于当前表单输入，不写入 localStorage）
+        function previewBubbleAndFont() {
+            // 移除已有预览样式
+            const prev = document.getElementById('previewBubbleStyle');
+            if (prev) prev.remove();
+
+            const cssArea = document.getElementById('customBubbleCss');
+            const customCss = cssArea ? cssArea.value.trim() : '';
+            const selected = document.querySelector('input[name="bubbleTheme"]:checked');
+            const theme = selected ? selected.value : (localStorage.getItem('chat_bubble_theme') || 'classic');
+            const fontSizeVal = parseInt(document.getElementById('chatFontSize').value || '14', 10);
+
+            if (customCss) {
+                const s = document.createElement('style');
+                s.id = 'previewBubbleStyle';
+                s.textContent = customCss;
+                document.head.appendChild(s);
+            } else {
+                let receivedBg = '#e5e5ea';
+                let sentBg = '#007aff';
+                let receivedColor = '#000';
+                let sentColor = '#fff';
+                if (theme === 'pink-yellow') { receivedBg = '#f8bbd0'; sentBg = '#fff59d'; receivedColor = '#000'; sentColor = '#000'; }
+                else if (theme === 'deep-blue') { receivedBg = '#d6e9ff'; sentBg = '#1e3a8a'; receivedColor = '#000'; sentColor = '#fff'; }
+                else if (theme === 'green-gray') { receivedBg = '#dcedc8'; sentBg = '#bdbdbd'; receivedColor = '#000'; sentColor = '#000'; }
+                const s = document.createElement('style');
+                s.id = 'previewBubbleStyle';
+                s.textContent = `.message.received{background:${receivedBg} !important; color:${receivedColor} !important;} .message.sent{background:${sentBg} !important; color:${sentColor} !important;} .message{font-size:${fontSizeVal}px !important;}`;
+                document.head.appendChild(s);
+            }
+
+            // 也应用到消息区（实时）
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) chatMessages.style.fontSize = fontSizeVal + 'px';
+            document.querySelectorAll('.message').forEach(m => m.style.fontSize = fontSizeVal + 'px');
+        }
+
+        // 应用自定义字体（持久化）
+        async function applyFont() {
+            // 优先：session Blob URL -> session data/url -> IndexedDB blob -> localStorage data/url
+            try {
+                // 1) session in-memory blob URL
+                if (window._sessionFontBlobUrl) {
+                    const blobUrl = window._sessionFontBlobUrl;
+                    await applyFontFromSource(blobUrl);
+                    return;
+                }
+
+                // 2) session data/url
+                if (window._sessionFontData) {
+                    await applyFontFromSource(window._sessionFontData);
+                    return;
+                }
+                if (window._sessionFontUrl) {
+                    await applyFontFromSource(window._sessionFontUrl);
+                    return;
+                }
+
+                // 3) try IndexedDB blob
+                const idbBlob = await getFontBlobFromIDB('userfont');
+                if (idbBlob) {
+                    try {
+                        const blobUrl = URL.createObjectURL(idbBlob);
+                        // keep in session so subsequent calls reuse it
+                        window._sessionFontBlobUrl = blobUrl;
+                        await applyFontFromSource(blobUrl);
+                        return;
+                    } catch (e) { console.warn('apply from idb blob failed', e); }
+                }
+
+                // 4) fallback to localStorage (data or url)
+                const data = localStorage.getItem('custom_font_data');
+                const url = localStorage.getItem('custom_font_url');
+                const source = data || url;
+                if (source) {
+                    await applyFontFromSource(source);
+                }
+            } catch (e) {
+                console.warn('applyFont error', e);
+            }
+        }
+
+        // helper that actually loads a font from a source (data/blob/http/url)
+        async function applyFontFromSource(source) {
+            const existing = document.getElementById('customFontStyle');
+            if (existing) existing.remove();
+            const applyStyleNode = () => {
+                const style = document.createElement('style');
+                style.id = 'customFontStyle';
+                style.textContent = `
+                    body, .phone-screen, .content,
+                    .status-bar, .header, .back-btn, h1, h2, h3, h4, h5, h6,
+                    .app-grid, .widget, .app-icon, .dock,
+                    .api-settings, .api-content, .save-btn,
+                    button, input, select, textarea, label,
+                    .chat-container, .chat-messages, .chat-input-area, .message, .message-avatar,
+                    .role-card, .role-info, .menu-content,
+                    .avatar-modal-content, .settings-tab-btn,
+                    #phoneAlert,
+                    #roleActionMenu, #createWorldbookModal, #addWorldbookContentModal, #avatarSettingsModal
+                { font-family: 'UserCustomFont', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important; }
+                `;
+                document.head.appendChild(style);
+            };
+
+            try {
+                if (typeof source === 'string' && source.startsWith('data:')) {
+                    const blob = dataURLToBlob(source);
+                    const ab = await blob.arrayBuffer();
+                    const ff = new FontFace('UserCustomFont', ab);
+                    await ff.load();
+                    try { document.fonts.add(ff); } catch (e) {}
+                    applyStyleNode();
+                } else if (typeof source === 'string' && source.startsWith('blob:')) {
+                    const resp = await fetch(source);
+                    if (!resp.ok) throw new Error('读取本地字体失败: ' + resp.status);
+                    const ab = await resp.arrayBuffer();
+                    const ff = new FontFace('UserCustomFont', ab);
+                    await ff.load();
+                    try { document.fonts.add(ff); } catch (e) {}
+                    applyStyleNode();
+                } else {
+                    // http(s) url
+                    const ff = new FontFace('UserCustomFont', `url(${source})`);
+                    await ff.load();
+                    try { document.fonts.add(ff); } catch (e) {}
+                    applyStyleNode();
+                }
+            } catch (err) {
+                console.warn('applyFontFromSource failed', err);
+                const status = document.getElementById('fontStatus'); if (status) status.textContent = '应用字体失败（可能被 CORS 阻止或文件无效）。';
+            }
+        }
+
+        // 处理本地文件选择：使用 Blob URL 快速预览，同时读取 data:URL 以便保存
+        function handleFontFileSelection(e) {
+            const file = (e && e.target && e.target.files && e.target.files[0]) || null;
+            if (!file) return;
+            // 释放上一个 blob URL（如果存在）
+            if (window._lastUploadedFontBlobUrl) {
+                try { URL.revokeObjectURL(window._lastUploadedFontBlobUrl); } catch (e) { /* ignore */ }
+                window._lastUploadedFontBlobUrl = null;
+            }
+
+            // 立即创建 blob URL 用于预览（更可靠、速度更快，避免部分浏览器对 data: 有限支持）
+            try {
+                const blobUrl = URL.createObjectURL(file);
+                window._lastUploadedFontBlobUrl = blobUrl;
+                // 清空 URL 输入（优先使用本地上传）
+                const input = document.getElementById('fontUrlInput'); if (input) input.value = '';
+                // 先用 blob URL 预览
+                previewFontWithSource(blobUrl, true);
+            } catch (err) {
+                console.warn('createObjectURL failed', err);
+            }
+
+            // 同时读取为 data URL（用于持久化保存到 localStorage）
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                try { window._lastUploadedFontDataUrl = ev.target.result; } catch (e) { window._lastUploadedFontDataUrl = null; }
+            };
+            reader.onerror = function() { console.warn('读取本地字体为 dataURL 失败'); window._lastUploadedFontDataUrl = null; };
+            reader.readAsDataURL(file);
+        }
+
+        // 预览字体（不保存）
+        function previewFont() {
+            const input = document.getElementById('fontUrlInput');
+            const url = input ? input.value.trim() : '';
+            // 优先使用 blob URL（本地上传），然后 data URL，最后使用已保存的设置
+            const source = url || window._lastUploadedFontBlobUrl || window._lastUploadedFontDataUrl || localStorage.getItem('custom_font_data') || localStorage.getItem('custom_font_url');
+            if (!source) { showPhoneAlert('请输入字体 URL 或选择本地字体文件'); return; }
+            previewFontWithSource(source, false);
+        }
+
+        async function previewFontWithSource(source, isLocalUploaded) {
+            const status = document.getElementById('fontStatus'); if (status) status.textContent = '加载中...';
+            const prevStyle = document.getElementById('previewFontStyle'); if (prevStyle) prevStyle.remove();
+            const prevFace = document.getElementById('previewFontFace'); if (prevFace) prevFace.remove();
+            const family = 'UserCustomFontPreview_' + Date.now();
+            try {
+                let ff;
+                // 尝试通过 ArrayBuffer 构造（对本地 blob/data 更可靠）
+                if (typeof source === 'string' && source.startsWith('blob:')) {
+                    const resp = await fetch(source);
+                    if (!resp.ok) throw new Error('无法读取本地文件（fetch 返回 ' + resp.status + ')' );
+                    const ab = await resp.arrayBuffer();
+                    ff = new FontFace(family, ab);
+                } else if (typeof source === 'string' && source.startsWith('data:')) {
+                    const comma = source.indexOf(',');
+                    const header = source.slice(0, comma);
+                    const isBase64 = header.indexOf(';base64') !== -1;
+                    let ab;
+                    if (isBase64) {
+                        const b64 = source.slice(comma + 1);
+                        const bin = atob(b64);
+                        const len = bin.length;
+                        const u8 = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) u8[i] = bin.charCodeAt(i);
+                        ab = u8.buffer;
+                    } else {
+                        const raw = decodeURIComponent(source.slice(comma + 1));
+                        const len = raw.length;
+                        const u8 = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) u8[i] = raw.charCodeAt(i);
+                        ab = u8.buffer;
+                    }
+                    ff = new FontFace(family, ab);
+                } else if (typeof source === 'string' && (source.startsWith('http:') || source.startsWith('https:'))) {
+                    // 远程 URL，直接使用 url() 方式（可能受 CORS 限制）
+                    ff = new FontFace(family, `url(${source})`);
+                } else {
+                    // 兜底：尝试 url()
+                    ff = new FontFace(family, `url(${source})`);
+                }
+
+                // 尝试加载 FontFace（若失败则回退到注入 @font-face）
+                try {
+                    await ff.load();
+                    try { document.fonts.add(ff); } catch (e) { /* ignore */ }
+                    const s = document.createElement('style'); s.id = 'previewFontStyle'; s.textContent = `#fontPreviewText { font-family: '${family}', sans-serif !important; }`;
+                    document.head.appendChild(s);
+                    if (status) status.textContent = '预览成功';
+                    return;
+                } catch (innerErr) {
+                    console.warn('FontFace load failed, falling back to @font-face injection', innerErr);
+                    // 回退到注入 @font-face 使用原始 URL（blob/data/http）
+                    if (typeof source === 'string' && (source.startsWith('blob:') || source.startsWith('data:') || source.startsWith('http') || source.startsWith('https')) ) {
+                        const style = document.createElement('style');
+                        style.id = 'previewFontFace';
+                        // 包含 src: url(...)；对于 data: 和 blob: 应可工作
+                        style.textContent = `@font-face{font-family: '${family}'; src: url(${source});}`;
+                        document.head.appendChild(style);
+                        const s2 = document.createElement('style'); s2.id = 'previewFontStyle'; s2.textContent = `#fontPreviewText { font-family: '${family}', sans-serif !important; }`;
+                        document.head.appendChild(s2);
+                        if (status) status.textContent = '预览成功（使用回退方式）';
+                        return;
+                    }
+                    throw innerErr;
+                }
+
+            } catch (err) {
+                console.error('preview failed', err);
+                if (status) status.textContent = '预览失败（可能被 CORS 阻止或文件无效）。';
+                showPhoneAlert('预览失败：' + (err && err.message ? err.message : err));
+                throw err;
+            }
+        }
+
+        // 清除并回收上传 Blob URL（同时从 IDB 删除）
+        async function clearFont() {
+            try {
+                if (window._lastUploadedFontBlobUrl) {
+                    try { URL.revokeObjectURL(window._lastUploadedFontBlobUrl); } catch (e) { /* ignore */ }
+                    window._lastUploadedFontBlobUrl = null;
+                }
+                if (window._sessionFontBlobUrl) {
+                    try { URL.revokeObjectURL(window._sessionFontBlobUrl); } catch (e) { /* ignore */ }
+                    window._sessionFontBlobUrl = null;
+                }
+            } catch (e) { /* ignore */ }
+            window._lastUploadedFontDataUrl = null;
+            window._sessionFontData = null;
+            window._sessionFontUrl = null;
+            localStorage.removeItem('custom_font_url');
+            localStorage.removeItem('custom_font_data');
+            // 尝试从 IndexedDB 删除持久化字体（忽略错误）
+            try { await deleteFontFromIDB('userfont'); } catch (e) { console.warn('IDB delete failed', e); }
+            const prevPreview = document.getElementById('previewFontStyle'); if (prevPreview) prevPreview.remove();
+            const prev = document.getElementById('customFontStyle'); if (prev) prev.remove();
+            const status = document.getElementById('fontStatus'); if (status) status.textContent = '已清除自定义字体';
+            showPhoneAlert('已清除自定义字体，恢复默认');
+        }
+
+        // 保存并应用字体
+        async function saveFontAndApply() {
+            const uploadedDataUrl = window._lastUploadedFontDataUrl || null;
+            const blobUrl = window._lastUploadedFontBlobUrl || null;
+            const url = document.getElementById('fontUrlInput') ? document.getElementById('fontUrlInput').value.trim() : '';
+
+            // 如果用户提供了远程 URL（优先仅保存 URL）
+            if (url) {
+                try {
+                    await previewFontWithSource(url, false);
+                    try { localStorage.setItem('custom_font_url', url); localStorage.removeItem('custom_font_data'); } catch (e) { console.warn('localStorage 写入失败', e); window._sessionFontUrl = url; showPhoneAlert('已保存至本次会话，localStorage 写入失败'); }
+                    // 删除 IDB 中的旧 blob（保持一致性）
+                    try { await deleteFontFromIDB('userfont'); } catch (e) { console.warn('IDB delete failed', e); }
+                    await applyFont();
+                    showPhoneAlert('字体 URL 已保存并应用');
+                    return;
+                } catch (e) {
+                    // preview 已给出提示
+                    return;
+                }
+            }
+
+            // 如果有本地上传（优先使用 Blob URL），尝试把 Blob 存入 IndexedDB
+            if (blobUrl || uploadedDataUrl) {
+                // 优先从 blobUrl 拉取 Blob
+                try {
+                    let blob = null;
+                    if (blobUrl) {
+                        try {
+                            const resp = await fetch(blobUrl);
+                            if (resp.ok) blob = await resp.blob();
+                        } catch (e) { console.warn('从 blobUrl fetch 失败，尝试 dataURL', e); }
+                    }
+
+                    if (!blob && uploadedDataUrl) {
+                        try { blob = dataURLToBlob(uploadedDataUrl); } catch (e) { console.warn('dataURLToBlob 失败', e); }
+                    }
+
+                    if (!blob) {
+                        showPhoneAlert('无法读取上传的字体文件，保存失败');
+                        return;
+                    }
+
+                    // 先预览（使用临时 ObjectURL）
+                    let tempUrl = null;
+                    try {
+                        tempUrl = URL.createObjectURL(blob);
+                        window._sessionFontBlobUrl = tempUrl;
+                        await previewFontWithSource(tempUrl, true);
+                    } catch (e) {
+                        console.warn('预览上传字体失败', e);
+                        if (tempUrl) { try { URL.revokeObjectURL(tempUrl); } catch (er) {} }
+                        throw e;
+                    }
+
+                    // 尝试将 Blob 保存到 IndexedDB
+                    try {
+                        await saveFontBlobToIDB('userfont', blob);
+                        // 清理 localStorage 跟会话中与 URL 相关的旧设置
+                        localStorage.removeItem('custom_font_url');
+                        localStorage.removeItem('custom_font_data');
+                        window._lastUploadedFontDataUrl = null;
+                        window._lastUploadedFontBlobUrl = null;
+                        // 保持 session 的 object URL 供 applyFont 使用
+                        window._sessionFontBlobUrl = tempUrl;
+                        await applyFont();
+                        showPhoneAlert('字体已保存并应用（已保存在 IndexedDB）');
+                        return;
+                    } catch (idbErr) {
+                        console.warn('IndexedDB 保存失败，尝试回退到 localStorage', idbErr);
+                        // 回退：把 blob 转为 dataURL 写入 localStorage（可能失败或超限）
+                        try {
+                            const ab = await blob.arrayBuffer();
+                            const u8 = new Uint8Array(ab);
+                            let binary = '';
+                            const chunk = 0x8000;
+                            for (let i = 0; i < u8.length; i += chunk) {
+                                binary += String.fromCharCode.apply(null, u8.subarray(i, i + chunk));
+                            }
+                            const b64 = btoa(binary);
+                            const ct = blob.type || 'font/woff2';
+                            const dataUrl = `data:${ct};base64,${b64}`;
+                            try { localStorage.setItem('custom_font_data', dataUrl); localStorage.removeItem('custom_font_url'); }
+                            catch (lsErr) { console.warn('localStorage 写入失败', lsErr); window._sessionFontData = dataUrl; showPhoneAlert('已保存至本次会话，浏览器存储受限'); }
+                            await applyFont();
+                            showPhoneAlert('字体已保存并应用（已保存至 localStorage 或本次会话）');
+                            return;
+                        } catch (convErr) {
+                            console.warn('转换为 dataURL 失败', convErr);
+                            showPhoneAlert('保存失败，无法持久化字体文件');
+                            return;
+                        }
+                    }
+
+                } catch (e) {
+                    console.warn('保存本地上传字体时出错', e);
+                    showPhoneAlert('保存失败：' + (e && e.message ? e.message : e));
+                    return;
+                }
+            }
+
+            // 若无任何来源，则提示
+            showPhoneAlert('请先选择本地字体文件或输入字体 URL');
         }
 
         function refreshChatMessages() {
@@ -1878,6 +3002,162 @@
             }
             
             applyChatsBackground();
+        }
+
+        // ===== 世界书功能 =====
+        
+        // 显示创建世界书模态框
+        function showCreateWorldbookModal() {
+            const modal = document.getElementById('createWorldbookModal');
+            document.getElementById('worldbookNameInput').value = '';
+            modal.style.display = 'flex';
+            modal.classList.add('is-active');
+        }
+
+        // 关闭创建世界书模态框
+        function closeCreateWorldbookModal() {
+            const modal = document.getElementById('createWorldbookModal');
+            modal.classList.remove('is-active');
+            setTimeout(() => {
+                if (!modal.classList.contains('is-active')) {
+                    modal.style.display = 'none';
+                }
+            }, 100);
+        }
+
+        // 创建世界书
+        function createWorldbook() {
+            const name = document.getElementById('worldbookNameInput').value.trim();
+            if (!name) {
+                alert('请输入世界书名称！');
+                return;
+            }
+
+            const newWorldbook = {
+                id: Date.now(),
+                name: name,
+                content: []
+            };
+
+            worldbooks.push(newWorldbook);
+            localStorage.setItem('worldbooks', JSON.stringify(worldbooks));
+            alert(`世界书 "${name}" 已创建！`);
+            closeCreateWorldbookModal();
+            loadWorldbookList();
+        }
+
+        // 加载世界书列表
+        function loadWorldbookList() {
+            const listDiv = document.getElementById('worldbookList');
+            worldbooks = JSON.parse(localStorage.getItem('worldbooks') || '[]');
+            listDiv.innerHTML = '';
+
+            if (worldbooks.length === 0) {
+                listDiv.innerHTML = '<div style="text-align: center; color: #888; margin-top: 50px;">暂无世界书，请点击右上角 ➕ 创建。</div>';
+                return;
+            }
+
+            worldbooks.forEach(worldbook => {
+                const card = document.createElement('div');
+                card.className = 'role-card';
+                card.style.cursor = 'pointer';
+                card.onclick = function() {
+                    currentWorldbookId = worldbook.id;
+                    showApp('worldbookDetail');
+                };
+
+                const avatar = document.createElement('div');
+                avatar.className = 'role-avatar';
+                avatar.textContent = worldbook.name[0].toUpperCase();
+
+                const info = document.createElement('div');
+                info.className = 'role-info';
+                info.innerHTML = `<h3>${worldbook.name}</h3>
+                                  <p>${worldbook.content.length} 条内容</p>`;
+
+                card.appendChild(avatar);
+                card.appendChild(info);
+                listDiv.appendChild(card);
+            });
+        }
+
+        // 加载世界书详情
+        function loadWorldbookDetail() {
+            const worldbook = worldbooks.find(w => w.id === currentWorldbookId);
+            if (!worldbook) {
+                alert('世界书不存在！');
+                showApp('worldbook');
+                return;
+            }
+
+            document.getElementById('worldbookDetailTitle').textContent = worldbook.name;
+            const contentDiv = document.getElementById('worldbookContentList');
+            contentDiv.innerHTML = '';
+
+            if (worldbook.content.length === 0) {
+                contentDiv.innerHTML = '<p style="text-align: center; color: #999; margin-top: 20px;">暂无内容，点击下方"添加内容"按钮添加。</p>';
+                return;
+            }
+
+            worldbook.content.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.style.cssText = 'background-color: #f8f8f8; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #007aff; position: relative;';
+                itemDiv.innerHTML = `<p style="margin: 0; white-space: pre-wrap; word-wrap: break-word; line-height: 1.5;">${item}</p>
+                    <button onclick="deleteWorldbookContent(${index})" style="position: absolute; top: 8px; right: 8px; background-color: #dc3545; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer;">删除</button>`;
+                contentDiv.appendChild(itemDiv);
+            });
+        }
+
+        // 显示添加内容模态框
+        function showAddWorldbookContentModal() {
+            const modal = document.getElementById('addWorldbookContentModal');
+            document.getElementById('worldbookContentInput').value = '';
+            modal.style.display = 'flex';
+            modal.classList.add('is-active');
+        }
+
+        // 关闭添加内容模态框
+        function closeAddWorldbookContentModal() {
+            const modal = document.getElementById('addWorldbookContentModal');
+            modal.classList.remove('is-active');
+            setTimeout(() => {
+                if (!modal.classList.contains('is-active')) {
+                    modal.style.display = 'none';
+                }
+            }, 100);
+        }
+
+        // 添加世界书内容
+        function addWorldbookContent() {
+            const contentText = document.getElementById('worldbookContentInput').value.trim();
+            if (!contentText) {
+                alert('请输入内容！');
+                return;
+            }
+
+            const worldbook = worldbooks.find(w => w.id === currentWorldbookId);
+            if (!worldbook) {
+                alert('世界书不存在！');
+                return;
+            }
+
+            worldbook.content.push(contentText);
+            localStorage.setItem('worldbooks', JSON.stringify(worldbooks));
+            alert('内容已添加！');
+            closeAddWorldbookContentModal();
+            loadWorldbookDetail();
+        }
+
+        // 删除世界书内容
+        function deleteWorldbookContent(index) {
+            if (confirm('确定要删除这条内容吗？')) {
+                const worldbook = worldbooks.find(w => w.id === currentWorldbookId);
+                if (worldbook) {
+                    worldbook.content.splice(index, 1);
+                    localStorage.setItem('worldbooks', JSON.stringify(worldbooks));
+                    loadWorldbookDetail();
+                }
+            }
         }
 
     </script>
