@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="https://i.postimg.cc/Gh23VcVK/IMG-4878.jpg">
+    <link rel="preconnect" href="https://i.postimg.cc" crossorigin>
+    <link rel="dns-prefetch" href="//i.postimg.cc">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f8f8f8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -36,8 +38,8 @@
             flex-direction: column;
         }
 
-        /* 媒体查询：在小屏幕（手机）上应用全屏样式 */
-        @media screen and (max-width: 768px) {
+        /* 媒体查询：仅在窄小屏手机上全屏展示，避免桌面窄窗口误触发 */
+        @media screen and (max-width: 430px) {
             .phone-screen {
                 width: 100vw;
                 height: 100vh; 
@@ -892,6 +894,80 @@
             cursor: pointer;
             z-index: 30;
         }
+
+        /* Zhihu 顶部右侧人像按钮 */
+        .zhihu-avatar-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            cursor: pointer;
+        }
+        .zhihu-avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Zhihu 个人主页样式 */
+        .zhihu-profile-header {
+            position: relative;
+            height: 140px;
+            background: #f2f2f2 center/cover no-repeat;
+        }
+        .zhihu-profile-avatar {
+            position: absolute;
+            left: 14px;
+            bottom: -24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background:#fff;
+        }
+        .zhihu-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 性能优化：对非首屏容器启用内容可见性，降低首次布局/绘制成本 */
+        #apiScreen,
+        #beautifyScreen,
+        #zhihuScreen,
+        #zhihuMessagesScreen,
+        #zhihuProfileScreen,
+        #fontScreen,
+        #roleListScreen,
+        #momentScreen,
+        #roleManagerScreen,
+        #chatDetailScreen,
+        #worldbookListScreen,
+        #worldbookDetailScreen {
+            content-visibility: auto;
+            contain-intrinsic-size: 800px 600px; /* 为跳过布局的内容提供占位尺寸，避免抖动 */
+        }
+
+        /* 轻量模式：减少重阴影/模糊与动画，提升性能 */
+        .light-mode .phone-screen { box-shadow: none !important; border: 1px solid #bbb; }
+        .light-mode .dock { backdrop-filter: none !important; background: rgba(255,255,255,0.92) !important; box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important; }
+        .light-mode .widget,
+        .light-mode .menu-content,
+        .light-mode .avatar-modal-content,
+        .light-mode .status-bar,
+        .light-mode .zhihu-avatar-btn,
+        .light-mode .zhihu-profile-avatar { box-shadow: none !important; }
+        .light-mode .message.thinking { animation: none !important; opacity: 1; }
+        .light-mode .moment-action-btn:hover { background: transparent !important; }
     </style>
 </head>
 <body>
@@ -911,24 +987,24 @@
             <div id="homeScreen">
                 <div class="app-grid">
                     <div class="widget wide">
-                        <img src="https://i.postimg.cc/xdTz1PDb/IMG-4890.jpg" alt="长方形图片">
+                        <img src="https://i.postimg.cc/xdTz1PDb/IMG-4890.jpg" alt="长方形图片" loading="lazy" decoding="async">
                     </div>
                     <div class="widget square left">
-                        <img src="https://i.postimg.cc/pXb5Fvb3/IMG-4891.jpg" alt="正方形图片1">
+                        <img src="https://i.postimg.cc/pXb5Fvb3/IMG-4891.jpg" alt="正方形图片1" loading="lazy" decoding="async">
                     </div>
                     <!-- QQ icon -->
                     <div class="app-icon" id="qq-icon" onclick="showApp('chat')">
-                        <img src="https://i.postimg.cc/VLx3BSZk/IMG-4884.jpg" alt="QQ 图标" data-app="chat">
+                        <img src="https://i.postimg.cc/VLx3BSZk/IMG-4884.jpg" alt="QQ 图标" data-app="chat" loading="lazy" decoding="async">
                         <p>QQ</p>
                     </div>
                     <!-- Worldbook icon -->
                     <div class="app-icon" id="worldbook-icon" onclick="showApp('worldbook')">
-                        <img src="https://i.postimg.cc/bJV5Gd2y/IMG-4883.jpg" alt="世界书图标" data-app="worldbook">
+                        <img src="https://i.postimg.cc/bJV5Gd2y/IMG-4883.jpg" alt="世界书图标" data-app="worldbook" loading="lazy" decoding="async">
                         <p>世界书</p>
                     </div>
                     <!-- Zhihu icon -->
                     <div class="app-icon" id="zhihu-icon" onclick="showApp('zhihu')">
-                        <img src="https://i.postimg.cc/tgp46TnT/IMG-4904.jpg" alt="知乎 图标" data-app="zhihu">
+                        <img src="https://i.postimg.cc/tgp46TnT/IMG-4904.jpg" alt="知乎 图标" data-app="zhihu" loading="lazy" decoding="async">
                         <p>知乎</p>
                     </div>
                 </div>
@@ -936,15 +1012,15 @@
 
             <div id="dock" class="dock">
                 <div class="app-icon" id="api-icon" onclick="showApp('api')">
-                    <img src="https://i.postimg.cc/5NXVmWxq/IMG-4886.jpg" alt="API 图标" data-app="api">
+                    <img src="https://i.postimg.cc/5NXVmWxq/IMG-4886.jpg" alt="API 图标" data-app="api" loading="lazy" decoding="async">
                     <p>API</p>
                 </div>
                 <div class="app-icon" id="beautify-icon" onclick="showApp('beautify')">
-                    <img src="https://i.postimg.cc/ZqV7g0H3/IMG-4885.jpg" alt="美化图标" data-app="beautifyApp">
+                    <img src="https://i.postimg.cc/ZqV7g0H3/IMG-4885.jpg" alt="美化图标" data-app="beautifyApp" loading="lazy" decoding="async">
                     <p>美化</p>
                 </div>
                 <div class="app-icon" id="font-icon" onclick="showApp('font')">
-                    <img src="https://i.postimg.cc/t498M0bK/IMG-4888.jpg" alt="字体图标" data-app="font">
+                    <img src="https://i.postimg.cc/t498M0bK/IMG-4888.jpg" alt="字体图标" data-app="font" loading="lazy" decoding="async">
                     <p>字体</p>
                 </div>
             </div>
@@ -986,6 +1062,13 @@
                     <h1>美化</h1>
                 </div>
                 <div class="api-content">
+                    <div style="padding:8px 0 12px 0; border-bottom:1px solid #eee; margin-bottom:12px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="checkbox" id="lightModeToggle" onchange="toggleLightMode()" style="width:auto; height:auto;">
+                            <span style="font-weight:600; color:#333;">轻量模式（更快，默认开启）</span>
+                        </label>
+                        <div style="color:#888; font-size:12px; margin-top:6px;">关闭壁纸预载与重阴影，减少动画，以显著提升加载速度。</div>
+                    </div>
                     <label for="backgroundUrl">手机背景图片 URL:</label>
                     <input type="text" id="backgroundUrl" placeholder="例如: https://example.com/bg.jpg">
 
@@ -1059,6 +1142,12 @@
                 <div class="header">
                     <span class="back-btn" onclick="showHomeScreen()">返回</span>
                     <h1>知乎</h1>
+                    <div class="zhihu-avatar-btn" onclick="showApp('zhihuProfile')" title="个人主页">
+                        <img id="zhihuTopAvatarImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='100%' height='100%' fill='%23E5E7EB'/><circle cx='40' cy='30' r='18' fill='%239CA3AF'/><rect x='18' y='52' width='44' height='12' rx='6' fill='%239CA3AF'/></svg>" alt="个人头像" onerror="this.removeAttribute('onerror'); this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';">
+                    </div>
+                    <button id="zhihuLoadBtn" onclick="loadZhihuAIContent()" aria-label="加载 AI 内容" title="加载" style="position:absolute; right:50px; top:50%; transform:translateY(-50%); width:28px; height:28px; padding:0; border:none; border-radius:999px; background:#eef2ff; color:#3b82f6; box-shadow:0 1px 4px rgba(0,0,0,0.08); cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                        <span style="font-size:16px; line-height:16px;">↻</span>
+                    </button>
                 </div>
                 <div class="api-content" id="zhihuContent" style="padding:12px; overflow:auto; height:calc(100% - 60px); box-sizing:border-box;">
                     <div id="zhihuPosts" style="display:flex; flex-direction:column; gap:12px; align-items:stretch;">
@@ -1114,6 +1203,24 @@
                     <div id="zhihuMessageList" style="display:flex; flex-direction:column; gap:10px;">
                         <!-- messages will be rendered here -->
                     </div>
+                </div>
+            </div>
+            
+            <!-- Zhihu Profile Screen (user homepage) -->
+            <div id="zhihuProfileScreen" class="api-settings" style="display:none; position:relative;">
+                <div class="header">
+                    <span class="back-btn" onclick="showApp('zhihu')">返回</span>
+                    <h1>个人主页</h1>
+                </div>
+                <div class="api-content" id="zhihuProfileContent" style="padding:0; overflow:auto; height:calc(100% - 50px); box-sizing:border-box; background:#fff;">
+                    <div id="zhihuProfileHeader" class="zhihu-profile-header">
+                        <div class="zhihu-profile-avatar" id="zhihuProfileAvatar">
+                            <img id="zhihuProfileAvatarImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><rect width='100%' height='100%' fill='%23E5E7EB'/><circle cx='40' cy='30' r='18' fill='%239CA3AF'/><rect x='18' y='52' width='44' height='12' rx='6' fill='%239CA3AF'/></svg>" alt="头像" onerror="this.removeAttribute('onerror'); this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';">
+                        </div>
+                        <span id="zhihuProfileMenuBtn" onclick="showZhihuInterestModal()" title="设置兴趣" style="position:absolute; right:12px; top:10px; font-size:22px; color:#444; cursor:pointer;">⋮</span>
+                    </div>
+                    <div style="height:28px;"></div>
+                    <div id="zhihuProfilePosts" style="padding:12px; display:flex; flex-direction:column; gap:12px;"></div>
                 </div>
             </div>
 
@@ -1329,6 +1436,29 @@
             </div>
         </div>
 
+        <!-- Zhihu Interests Modal -->
+        <div id="zhihuInterestModal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; justify-content: center; align-items: center; visibility: hidden; pointer-events: none;" onclick="if(event.target.id==='zhihuInterestModal'){ closeZhihuInterestModal(); }">
+            <div class="avatar-modal-content" style="max-width: 340px;">
+                <h3 style="margin-top:0;">选择感兴趣的话题</h3>
+                <div id="zhihuInterestList" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                    <label><input type="checkbox" value="科技"> 科技</label>
+                    <label><input type="checkbox" value="编程"> 编程</label>
+                    <label><input type="checkbox" value="AI"> AI</label>
+                    <label><input type="checkbox" value="文学"> 文学</label>
+                    <label><input type="checkbox" value="电影"> 电影</label>
+                    <label><input type="checkbox" value="旅行"> 旅行</label>
+                    <label><input type="checkbox" value="美食"> 美食</label>
+                    <label><input type="checkbox" value="体育"> 体育</label>
+                    <label><input type="checkbox" value="历史"> 历史</label>
+                    <label><input type="checkbox" value="心理学"> 心理学</label>
+                </div>
+                <div class="avatar-modal-buttons" style="margin-top:12px;">
+                    <button class="save" onclick="saveZhihuInterests()">保存</button>
+                    <button class="cancel" onclick="closeZhihuInterestModal()">取消</button>
+                </div>
+            </div>
+        </div>
+
         <div id="imageViewModal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 2500; justify-content: center; align-items: center; visibility: hidden; pointer-events: none;" onclick="closeImageView()">
             <div style="max-width: 90%; max-height: 80%; display: flex; flex-direction: column; align-items: center;">
                 <img id="viewedImage" src="" style="max-width: 100%; max-height: 60vh; border-radius: 8px; margin-bottom: 20px;">
@@ -1505,6 +1635,7 @@
             beautify: document.getElementById('beautifyScreen'),
             zhihu: document.getElementById('zhihuScreen'),
             zhihuMessages: document.getElementById('zhihuMessagesScreen'),
+            zhihuProfile: document.getElementById('zhihuProfileScreen'),
             font: document.getElementById('fontScreen'),
             roleList: document.getElementById('roleListScreen'),
             roleManager: document.getElementById('roleManagerScreen'),
@@ -1516,6 +1647,12 @@
         let currentRoleId = null;
         let worldbooks = [];
         let currentWorldbookId = null;
+        const IMAGE_COMPRESS_PRESET = {
+            avatar: { maxW: 256, maxH: 256, quality: 0.75 },
+            widgetWide: { maxW: 1024, maxH: 640, quality: 0.76 },
+            widgetSquare: { maxW: 640, maxH: 640, quality: 0.76 },
+            momentBg: { maxW: 900, maxH: 900, quality: 0.72 }
+        };
         
         // 初始加载：读取本地存储
         window.onload = function() {
@@ -1541,23 +1678,174 @@
                 document.getElementById('apiStatus').style.color = 'gray';
                 document.getElementById('apiStatus').textContent = '当前状态: 已加载上次配置，请点击“拉取模型”验证。';
             }
-            
-            roles = JSON.parse(localStorage.getItem('roles') || '[]');
-            worldbooks = JSON.parse(localStorage.getItem('worldbooks') || '[]');
-            loadRoleList();
-            loadWorldbookList();
+
+            // 轻量模式默认关闭，用户可在“美化”页手动开启
+            if (localStorage.getItem('light_mode') === null) {
+                localStorage.setItem('light_mode', 'false');
+            } else if (localStorage.getItem('light_mode') === 'true' && !localStorage.getItem('light_mode_user_set')) {
+                // 迁移：之前默认开启导致壁纸不显示，这里一次性关闭并记录
+                localStorage.setItem('light_mode', 'false');
+            }
+            try { applyLightModeFromStorage(); } catch (e) {}
+
+            // 延后读取较大本地数据和非关键渲染，避免阻塞首次可交互
+            const idle = window.requestIdleCallback || function(cb){ return setTimeout(cb, 0); };
+            idle(() => {
+                try { roles = JSON.parse(localStorage.getItem('roles') || '[]'); } catch(e) { roles = []; }
+                try { worldbooks = JSON.parse(localStorage.getItem('worldbooks') || '[]'); } catch(e) { worldbooks = []; }
+                // 角色列表与世界书列表在首次进入对应页面时再渲染（showApp 内已有按需渲染）
+            });
+
             loadBeautifySettings();
-            // 应用气泡主题与字体（全局）
-            applyChatTheme();
-            applyChatFontSize();
-            // 应用自定义字体（如果有）
-            applyFont();
+            // 应用聊天主题/字体等非关键样式：空闲时再处理
+            idle(() => { try { applyChatTheme(); } catch(e){} });
+            idle(() => { try { applyChatFontSize(); } catch(e){} });
+            idle(() => { try { applyFont(); } catch(e){} });
+            // 空闲时对已存储的 dataURL 图片做一次性压缩迁移
+            idle(() => { try { migrateAndCompressStoredImages(); } catch(e){} });
             // 初始化：主屏幕添加 home-mode class
             document.getElementById('appContainer').classList.add('home-mode');
             // 启动时钟并每分钟更新一次
             updateClock();
             setInterval(updateClock, 60000);
         };
+
+        // 统一为非关键图片添加懒加载和异步解码，避免首屏阻塞
+        function lazyEnhanceImages() {
+            const skipIds = new Set(['zhihuTopAvatarImg', 'zhihuProfileAvatarImg']);
+            const imgs = document.querySelectorAll('img');
+            imgs.forEach(img => {
+                if (skipIds.has(img.id)) return; // 关键头像不懒加载，避免显示延迟
+                if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+                if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+                if (!img.hasAttribute('fetchpriority')) img.setAttribute('fetchpriority', 'low');
+            });
+        }
+
+        // 轻量模式：根据存储状态应用/取消
+        function applyLightMode(enabled) {
+            const root = document.documentElement;
+            if (enabled) root.classList.add('light-mode'); else root.classList.remove('light-mode');
+            const phone = document.querySelector('.phone-screen');
+            if (phone) {
+                if (enabled) {
+                    phone.style.backgroundImage = 'none';
+                }
+            }
+            // 内容层在轻量模式下保持白底，避免透明叠加造成绘制成本
+            document.querySelectorAll('.content').forEach(c => {
+                if (enabled) c.style.background = '#fff';
+            });
+        }
+
+        function applyLightModeFromStorage() {
+            const enabled = (localStorage.getItem('light_mode') === 'true'); // 默认关闭
+            applyLightMode(enabled);
+        }
+
+        function toggleLightMode() {
+            const checkbox = document.getElementById('lightModeToggle');
+            const enabled = !!(checkbox && checkbox.checked);
+            localStorage.setItem('light_mode', enabled ? 'true' : 'false');
+            localStorage.setItem('light_mode_user_set', '1');
+            applyLightMode(enabled);
+            // 背景与图标按需刷新（轻量模式不加载壁纸）
+            try { loadBeautifySettings(); } catch (e) {}
+            showPhoneAlert(enabled ? '轻量模式已开启' : '轻量模式已关闭');
+        }
+
+        // ========= 图片压缩工具 =========
+        function estimateDataUrlBytes(dataUrl) {
+            if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) return 0;
+            const i = dataUrl.indexOf(','); if (i < 0) return 0;
+            const b64Len = dataUrl.length - i - 1;
+            return Math.floor(b64Len * 0.75);
+        }
+
+        function loadImageElement(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('图片加载失败'));
+                img.src = src;
+            });
+        }
+
+        function canvasToPreferredDataURL(canvas, quality = 0.8) {
+            // 优先 WebP，失败则 JPEG
+            try {
+                const webp = canvas.toDataURL('image/webp', quality);
+                if (typeof webp === 'string' && webp.startsWith('data:image/webp')) return webp;
+            } catch (e) {}
+            try {
+                const jpg = canvas.toDataURL('image/jpeg', quality);
+                if (typeof jpg === 'string' && jpg.startsWith('data:image/jpeg')) return jpg;
+            } catch (e) {}
+            // 兜底 PNG（体积可能大）
+            return canvas.toDataURL('image/png');
+        }
+
+        async function compressDataUrl(dataUrl, opts = { maxW: 800, maxH: 800, quality: 0.8 }) {
+            if (!dataUrl || !dataUrl.startsWith('data:')) return dataUrl;
+            const img = await loadImageElement(dataUrl);
+            const { maxW, maxH, quality } = opts;
+            const iw = img.naturalWidth || img.width;
+            const ih = img.naturalHeight || img.height;
+            let tw = iw, th = ih;
+            const r = Math.min(maxW / iw, maxH / ih, 1);
+            tw = Math.max(1, Math.floor(iw * r));
+            th = Math.max(1, Math.floor(ih * r));
+            const canvas = document.createElement('canvas');
+            canvas.width = tw; canvas.height = th;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, tw, th);
+            return canvasToPreferredDataURL(canvas, quality);
+        }
+
+        async function compressFileToDataUrl(file, opts = { maxW: 800, maxH: 800, quality: 0.8 }) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const raw = e.target.result;
+                        const out = await compressDataUrl(raw, opts);
+                        resolve(out);
+                    } catch (err) { reject(err); }
+                };
+                reader.onerror = () => reject(new Error('读取文件失败'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function readAndCompressImageFile(fileInput, opts) {
+            const f = fileInput?.files?.[0];
+            if (!f) return null;
+            try { return await compressFileToDataUrl(f, opts); } catch (e) { return null; }
+        }
+
+        async function migrateAndCompressStoredImages() {
+            const targets = [
+                { key: 'moment_bg', opts: IMAGE_COMPRESS_PRESET.momentBg },
+                { key: 'moment_avatar', opts: IMAGE_COMPRESS_PRESET.avatar },
+                { key: 'beautify_widget_wide', opts: IMAGE_COMPRESS_PRESET.widgetWide },
+                { key: 'beautify_widget_square', opts: IMAGE_COMPRESS_PRESET.widgetSquare },
+                { key: 'chat_user_avatar_url', opts: IMAGE_COMPRESS_PRESET.avatar },
+                { key: 'chat_ai_avatar_url', opts: IMAGE_COMPRESS_PRESET.avatar }
+            ];
+            for (const t of targets) {
+                try {
+                    const v = localStorage.getItem(t.key);
+                    if (!v || !v.startsWith('data:')) continue;
+                    const size = estimateDataUrlBytes(v);
+                    if (size <= 350 * 1024) continue; // 小于约350KB不处理
+                    const compressed = await compressDataUrl(v, t.opts);
+                    const newSize = estimateDataUrlBytes(compressed);
+                    if (newSize > 0 && newSize < size) {
+                        localStorage.setItem(t.key, compressed);
+                    }
+                } catch (e) { /* ignore single failure */ }
+            }
+        }
 
         // 在小手机内部显示短消息替代浏览器 alert（自适应手机宽度）
         function showPhoneAlert(msg, timeout = 2500) {
@@ -1714,20 +2002,40 @@
             localStorage.setItem('zhihu_posts', JSON.stringify(posts || []));
         }
 
+        // 用户主页帖子（与首页分离）
+        function getZhihuUserPosts() {
+            try { return JSON.parse(localStorage.getItem('zhihu_user_posts') || '[]'); } catch (e) { return []; }
+        }
+
+        function saveZhihuUserPosts(posts) {
+            localStorage.setItem('zhihu_user_posts', JSON.stringify(posts || []));
+        }
+
         function renderZhihuPosts() {
             const container = document.getElementById('zhihuPosts');
             if (!container) return;
             const posts = getZhihuPosts();
             container.innerHTML = '';
-            if (posts.length === 0) {
-                const empty = document.createElement('div');
-                empty.style.color = '#888';
-                empty.style.textAlign = 'center';
-                empty.style.padding = '24px 12px';
-                empty.textContent = '还没有内容，点击下方 + 发表第一条';
-                container.appendChild(empty);
-                return;
-            }
+
+            // 搜索装饰条（纯本地 DOM，无外链）
+            const deco = document.createElement('div');
+            deco.style.cssText = 'display:flex;align-items:center;gap:8px;width:92%;max-width:340px;height:36px;border-radius:18px;margin:8px auto 12px;padding:0 12px;background:#f1f5f9;color:#94a3b8;font-size:13px;';
+            const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            icon.setAttribute('width', '18');
+            icon.setAttribute('height', '18');
+            icon.setAttribute('viewBox', '0 0 24 24');
+            icon.style.flexShrink = '0';
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('fill', '#9ca3af');
+            path.setAttribute('d', 'M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.49 21.49 20l-5.99-6zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z');
+            icon.appendChild(path);
+            const text = document.createElement('span');
+            text.textContent = '搜索知乎内容';
+            deco.appendChild(icon);
+            deco.appendChild(text);
+            container.appendChild(deco);
+
+            if (posts.length === 0) { return; }
             posts.slice().reverse().forEach(p => {
                 const card = document.createElement('div');
                 card.style.background = '#fff';
@@ -1753,12 +2061,121 @@
         function postToZhihu() {
             const text = (document.getElementById('zhihuInput')?.value || '').trim();
             if (!text) { alert('请输入内容后再发布'); return; }
-            const posts = getZhihuPosts();
+            const posts = getZhihuUserPosts();
             posts.push({ text, ts: Date.now() });
-            saveZhihuPosts(posts);
+            saveZhihuUserPosts(posts);
             closeZhihuModal();
-            renderZhihuPosts();
-            showPhoneAlert('已发布到知乎');
+            try { renderZhihuProfile(); } catch (e) {}
+            showPhoneAlert('已发布到个人主页');
+        }
+
+        // 渲染个人主页
+        function renderZhihuProfile() {
+            const header = document.getElementById('zhihuProfileHeader');
+            if (!header) return;
+            const bg = localStorage.getItem('zhihu_profile_bg') || localStorage.getItem('beautify_background') || 'https://i.postimg.cc/K8K84gkL/IMG-4887.jpg';
+            header.style.backgroundImage = `url(${bg})`;
+            header.style.backgroundSize = 'cover';
+            header.style.backgroundPosition = 'center';
+
+            const avatarImg = document.getElementById('zhihuProfileAvatarImg');
+            const topAvatarImg = document.getElementById('zhihuTopAvatarImg');
+            const avatarSrc = localStorage.getItem('zhihu_profile_avatar') || (topAvatarImg ? topAvatarImg.src : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
+            if (avatarImg) avatarImg.src = avatarSrc;
+
+            const list = document.getElementById('zhihuProfilePosts');
+            if (!list) return;
+            const posts = getZhihuUserPosts();
+            list.innerHTML = '';
+            if (posts.length === 0) {
+                const empty = document.createElement('div');
+                empty.style.cssText = 'color:#999; text-align:center; padding:24px 0;';
+                empty.textContent = '还没有发布内容';
+                list.appendChild(empty);
+                return;
+            }
+            posts.slice().reverse().forEach(p => {
+                const card = document.createElement('div');
+                card.style.cssText = 'background:#fff; border-radius:12px; padding:12px; box-shadow:0 2px 10px rgba(0,0,0,0.04);';
+                const text = document.createElement('div');
+                text.style.cssText = 'font-size:15px; color:#333; line-height:1.6; white-space:pre-wrap;';
+                text.textContent = p.text;
+                const time = document.createElement('div');
+                const d = new Date(p.ts || Date.now());
+                time.style.cssText = 'font-size:12px; color:#999; margin-top:8px;';
+                time.textContent = `${d.getFullYear()}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')} ${d.toTimeString().slice(0,8)}`;
+                card.appendChild(text);
+                card.appendChild(time);
+                list.appendChild(card);
+            });
+        }
+
+        // ---- 兴趣选择弹窗 ----
+        function showZhihuInterestModal() {
+            const modal = document.getElementById('zhihuInterestModal');
+            if (!modal) return;
+            try {
+                const saved = JSON.parse(localStorage.getItem('zhihu_interests') || '[]');
+                modal.querySelectorAll('#zhihuInterestList input[type="checkbox"]').forEach(cb => {
+                    cb.checked = saved.includes(cb.value);
+                });
+            } catch (e) {}
+            modal.style.display = 'flex';
+            modal.style.visibility = 'visible';
+            modal.style.pointerEvents = 'auto';
+        }
+        function closeZhihuInterestModal() {
+            const modal = document.getElementById('zhihuInterestModal');
+            if (!modal) return;
+            modal.style.display = 'none';
+            modal.style.visibility = 'hidden';
+            modal.style.pointerEvents = 'none';
+        }
+        function saveZhihuInterests() {
+            const modal = document.getElementById('zhihuInterestModal');
+            if (!modal) return;
+            const vals = [];
+            modal.querySelectorAll('#zhihuInterestList input[type="checkbox"]').forEach(cb => { if (cb.checked) vals.push(cb.value); });
+            localStorage.setItem('zhihu_interests', JSON.stringify(vals));
+            closeZhihuInterestModal();
+            showPhoneAlert('兴趣话题已保存');
+        }
+
+        // ---- 根据兴趣生成首页内容 ----
+        function loadZhihuAIContent(count = 3) {
+            let interests = [];
+            try { interests = JSON.parse(localStorage.getItem('zhihu_interests') || '[]'); } catch (e) { interests = []; }
+            if (!interests || interests.length === 0) { showPhoneAlert('请先在个人主页右上角设置兴趣话题'); return; }
+
+            const Q = {
+                '科技': ['最新的手机芯片有什么突破？','量子计算何时走向大众？','可穿戴设备的下一代形态是什么？'],
+                '编程': ['如何写出更易维护的代码？','Rust 与 Go 如何选择？','前端性能优化有哪些常见误区？'],
+                'AI': ['大模型如何落地到日常应用？','多模态 AI 能做什么？','如何评估一个模型的效果？'],
+                '文学': ['你最喜欢的现代诗是哪一首？','叙事视角如何改变故事？','如何培养阅读习惯？'],
+                '电影': ['今年最值得看的国产片？','配乐的重要性体现在哪？','如何评价一部电影的剪辑？'],
+                '旅行': ['一个人旅行如何规划？','冬天的北海道怎么玩？','如何选择性价比高的路线？'],
+                '美食': ['如何做一碗好吃的拉面？','家常菜里你最爱的组合？','如何把简单食材做出层次？'],
+                '体育': ['如何提升耐力跑成绩？','最近的联赛看哪支队？','力量训练如何避免受伤？'],
+                '历史': ['宋代经济为何发达？','哪段近代史最让你印象深刻？','如何看待史料的可信度？'],
+                '心理学': ['如何应对拖延？','社交焦虑有哪些方法？','如何建立稳定的自我评价？']
+            };
+            const A = ['我认为可以从实践出发，结合案例讨论。','一个可行的思路是分解问题并逐步验证。','先列出关键因素，再逐项分析其影响。','参考近期的资料与数据，会更客观一些。','简单说，说到底还是取决于真实需求和环境。'];
+
+            const make = (topic) => {
+                const qs = Q[topic] || ['这个话题你怎么看？'];
+                const q = qs[Math.floor(Math.random() * qs.length)];
+                const a = A[Math.floor(Math.random() * A.length)];
+                return `问（${topic}）：${q}\n答：${a}`;
+            };
+
+            const existing = getZhihuPosts();
+            for (let i = 0; i < count; i++) {
+                const t = interests[Math.floor(Math.random() * interests.length)];
+                existing.push({ text: make(t), ts: Date.now() - i * 60000 });
+            }
+            saveZhihuPosts(existing);
+            try { renderZhihuPosts(); } catch (e) {}
+            showPhoneAlert('已加载 AI 生成的内容');
         }
 
         // bind zhihu bottom toolbar buttons when DOM ready
@@ -1771,6 +2188,8 @@
             if (msgBtn) msgBtn.addEventListener('click', () => { showApp('zhihuMessages'); });
             // ensure posts render when entering zhihu
             renderZhihuPosts();
+            // 全局图片懒加载增强
+            try { lazyEnhanceImages(); } catch (e) {}
         });
 
         // ----- Zhihu messages renderer (simulated private messages) -----
@@ -1845,15 +2264,10 @@
                 document.querySelector('.status-bar').classList.add('hidden');
                 document.getElementById('appContainer').classList.add('app-mode');
                 document.getElementById('appContainer').classList.remove('home-mode');
-                // 强制APP容器背景为白色
+                // 强制APP容器背景为白色（保留手机壁纸，不再清除，避免回主页壁纸丢失）
                 document.getElementById('appContainer').style.background = '#ffffff';
                 document.getElementById('appContainer').style.backgroundImage = 'none';
-                // 进入 APP 时禁用手机壁纸，避免边缘透出
-                const phone = document.querySelector('.phone-screen');
-                if (phone) {
-                    phone.style.backgroundImage = 'none';
-                    phone.style.backgroundColor = '#ffffff';
-                }
+                // 不修改 .phone-screen 背景，保持壁纸
                 const dock = document.getElementById('dock');
                 if (dock) dock.style.display = 'none';
             }
@@ -1868,14 +2282,15 @@
             screens['worldbook'].style.display = 'none';
             screens['zhihu'] && (screens['zhihu'].style.display = 'none');
             screens['zhihuMessages'] && (screens['zhihuMessages'].style.display = 'none');
+            screens['zhihuProfile'] && (screens['zhihuProfile'].style.display = 'none');
             screens['worldbookDetail'].style.display = 'none';
             const momentScreen = document.getElementById('momentScreen');
             if (momentScreen) momentScreen.style.display = 'none';
 
-            // 强制所有内容区域为白色背景
+            // 强制所有内容区域为白色背景（不使用 !important，便于主页恢复透明）
             document.querySelectorAll('.content, .api-settings, .chat-container').forEach(c => {
-                c.style.background = '#ffffff !important';
-                c.style.backgroundImage = 'none !important';
+                c.style.background = '#ffffff';
+                c.style.backgroundImage = 'none';
             });
             // 也确保消息区是白底（若存在）
             const chatMessagesEl = document.getElementById('chatMessages');
@@ -1913,6 +2328,9 @@
                 const c2 = document.getElementById('beautifyChatBgImage');
                 if (c1) c1.value = chatBgColor;
                 if (c2) c2.value = chatBgImage;
+                // 轻量模式开关状态
+                const lmToggle = document.getElementById('lightModeToggle');
+                if (lmToggle) lmToggle.checked = (localStorage.getItem('light_mode') !== 'false');
             } else if (appName === 'font') {
                 // 打开字体设置页面
                 screens['font'].style.display = 'flex';
@@ -1935,6 +2353,9 @@
             } else if (appName === 'zhihuMessages') {
                 screens['zhihuMessages'].style.display = 'flex';
                 try { renderZhihuMessages(); } catch (e) { console.warn('渲染知乎消息失败', e); }
+            } else if (appName === 'zhihuProfile') {
+                screens['zhihuProfile'].style.display = 'flex';
+                try { renderZhihuProfile(); } catch (e) { console.warn('渲染知乎个人主页失败', e); }
             } else if (appName === 'worldbookDetail') {
                 screens['worldbookDetail'].style.display = 'flex';
                 loadWorldbookDetail();
@@ -2098,22 +2519,43 @@
             const phone = document.querySelector('.phone-screen');
             const bg = localStorage.getItem('beautify_background');
             const defaultBg = 'https://i.postimg.cc/K8K84gkL/IMG-4887.jpg';
-            if (bg) {
-                phone.style.backgroundImage = `url(${bg})`;
-                phone.style.backgroundSize = 'cover';
-                phone.style.backgroundPosition = 'center';
-            } else {
-                phone.style.backgroundImage = `url(${defaultBg})`;
-                phone.style.backgroundSize = 'cover';
-                phone.style.backgroundPosition = 'center';
-            }
+            const lightMode = (localStorage.getItem('light_mode') === 'true');
 
-            // 如果设置了背景（包括默认背景），将内部 content 区域背景设为透明以显示背景图
-            const contents = document.querySelectorAll('.content');
-            if (phone.style.backgroundImage && phone.style.backgroundImage !== '') {
-                contents.forEach(c => c.style.background = 'transparent');
+            // 轻量模式下：跳过壁纸加载，直接纯色背景与白底内容，以减少解码与绘制成本
+            if (lightMode) {
+                if (phone) {
+                    phone.style.backgroundImage = 'none';
+                    phone.style.backgroundColor = phone.style.backgroundColor || '#e0e0e0';
+                }
+                document.querySelectorAll('.content').forEach(c => (c.style.background = '#fff'));
             } else {
-                contents.forEach(c => c.style.background = '#fff');
+                // 非轻量模式：先用纯色快速显示，异步预加载壁纸，避免首屏阻塞
+                if (phone) {
+                    phone.style.backgroundImage = 'none';
+                    phone.style.backgroundColor = phone.style.backgroundColor || '#e0e0e0';
+                }
+                const targetUrl = bg || defaultBg;
+                const img = new Image();
+                img.decoding = 'async';
+                img.loading = 'eager';
+                img.src = targetUrl;
+                img.onload = () => {
+                    if (phone) {
+                        phone.style.backgroundImage = `url(${targetUrl})`;
+                        phone.style.backgroundSize = 'cover';
+                        phone.style.backgroundPosition = 'center';
+                    }
+                    // 壁纸就绪后再把内容层设为透明
+                    document.querySelectorAll('.content').forEach(c => (c.style.background = 'transparent'));
+                };
+                img.onerror = () => {
+                    // 加载失败：使用本地渐变作为兜底壁纸
+                    if (phone) {
+                        phone.style.backgroundImage = 'none';
+                        phone.style.background = 'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)';
+                    }
+                    document.querySelectorAll('.content').forEach(c => (c.style.background = 'transparent'));
+                };
             }
 
             const defaultIcons = {
@@ -2273,15 +2715,15 @@
             reader.readAsDataURL(f);
         }
 
-        function previewWidgetImage(kind) {
+        async function previewWidgetImage(kind) {
             const fileEl = document.getElementById(`beautifyWidget${kind === 'wide' ? 'WideFile' : 'SquareFile'}`);
             const urlEl = document.getElementById(`beautifyWidget${kind === 'wide' ? 'Wide' : 'Square'}`);
             const previewUrl = urlEl.value.trim();
             if (fileEl && fileEl.files && fileEl.files.length > 0) {
-                readFileInputAsDataUrl(fileEl, dataUrl => {
-                    if (dataUrl) applyWidgetToPreview(kind, dataUrl, false);
-                    else showPhoneAlert('读取图片失败');
-                });
+                const preset = kind === 'wide' ? IMAGE_COMPRESS_PRESET.widgetWide : IMAGE_COMPRESS_PRESET.widgetSquare;
+                const dataUrl = await readAndCompressImageFile(fileEl, preset);
+                if (dataUrl) applyWidgetToPreview(kind, dataUrl, false);
+                else showPhoneAlert('读取图片失败');
             } else if (previewUrl) {
                 applyWidgetToPreview(kind, previewUrl, false);
             } else {
@@ -2309,14 +2751,14 @@
             }
         }
 
-        function saveWidgetImage(kind) {
+        async function saveWidgetImage(kind) {
             const fileEl = document.getElementById(`beautifyWidget${kind === 'wide' ? 'WideFile' : 'SquareFile'}`);
             const urlEl = document.getElementById(`beautifyWidget${kind === 'wide' ? 'Wide' : 'Square'}`);
             if (fileEl && fileEl.files && fileEl.files.length > 0) {
-                readFileInputAsDataUrl(fileEl, dataUrl => {
-                    if (dataUrl) applyWidgetToPreview(kind, dataUrl, true);
-                    else showPhoneAlert('读取图片失败，未保存');
-                });
+                const preset = kind === 'wide' ? IMAGE_COMPRESS_PRESET.widgetWide : IMAGE_COMPRESS_PRESET.widgetSquare;
+                const dataUrl = await readAndCompressImageFile(fileEl, preset);
+                if (dataUrl) applyWidgetToPreview(kind, dataUrl, true);
+                else showPhoneAlert('读取图片失败，未保存');
             } else {
                 const previewUrl = urlEl.value.trim();
                 if (!previewUrl) { showPhoneAlert('请上传图片或输入 URL'); return; }
@@ -2468,10 +2910,25 @@
                 avatar.className = 'role-avatar';
                 avatar.textContent = role.name[0].toUpperCase();
 
+                // 获取最新一条消息：优先从 localStorage 的 chat_history_<id> 读取
+                let lastMessageText = '';
+                try {
+                    const raw = localStorage.getItem('chat_history_' + role.id) || '[]';
+                    const chatHistory = JSON.parse(raw);
+                    if (Array.isArray(chatHistory) && chatHistory.length > 0) {
+                        const lastMessage = chatHistory[chatHistory.length - 1];
+                        const content = (lastMessage && (lastMessage.text || lastMessage.content || '')) || '';
+                        lastMessageText = content.substring(0, 30) + (content.length > 30 ? '...' : '');
+                    }
+                } catch (e) {
+                    console.warn('读取聊天历史失败', e);
+                    lastMessageText = '';
+                }
+
                 const info = document.createElement('div');
                 info.className = 'role-info';
                 info.innerHTML = `<h3>${role.name}</h3>
-                                  <p>模型: ${role.model} - ${role.prompt.substring(0, 30)}...</p>`;
+                                  <p>${lastMessageText}</p>`;
 
                 card.appendChild(avatar);
                 card.appendChild(info);
@@ -3157,7 +3614,7 @@
             }, 300);
         }
 
-        function handleAvatarFileUpload(type) {
+        async function handleAvatarFileUpload(type) {
             const fileInputId = type === 'user' ? 'userAvatarFile' : 'aiAvatarFile';
             const inputId = type === 'user' ? 'userAvatarUrl' : 'aiAvatarUrl';
             
@@ -3165,26 +3622,17 @@
             const file = fileInput.files[0];
             
             if (!file) return;
-            // 检查文件大小（限制为 1MB）
-            if (file.size > 1024 * 1024) {
-                alert('图片文件过大，请选择小于 1MB 的图片');
-                fileInput.value = '';
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const dataUrl = e.target.result;
-                // 将 Data URL 保存到输入框
+            // 压缩到小尺寸头像
+            try {
+                const preset = IMAGE_COMPRESS_PRESET.avatar;
+                const dataUrl = await compressFileToDataUrl(file, { maxW: preset.maxW, maxH: preset.maxH, quality: preset.quality });
                 document.getElementById(inputId).value = dataUrl;
-                // 更新预览
                 updateAvatarPreview(type);
-            };
-            reader.onerror = function() {
-                alert('文件读取失败，请重试');
+                showPhoneAlert('头像已压缩并预览');
+            } catch (e) {
+                alert('图片处理失败，请重试');
                 fileInput.value = '';
-            };
-            reader.readAsDataURL(file);
+            }
         }
 
         function updateAvatarPreview(type) {
@@ -3630,7 +4078,19 @@
                 }
             } catch (err) {
                 console.warn('applyFontFromSource failed', err);
-                const status = document.getElementById('fontStatus'); if (status) status.textContent = '应用字体失败（可能被 CORS 阻止或文件无效）。';
+                try {
+                    localStorage.removeItem('custom_font_url');
+                    localStorage.removeItem('custom_font_data');
+                } catch(e) {}
+                try { await deleteFontFromIDB('userfont'); } catch(e) {}
+                try {
+                    if (window._sessionFontBlobUrl) { URL.revokeObjectURL(window._sessionFontBlobUrl); }
+                } catch(e) {}
+                window._sessionFontBlobUrl = null;
+                window._sessionFontData = null;
+                window._sessionFontUrl = null;
+                const status = document.getElementById('fontStatus');
+                if (status) status.textContent = '应用字体失败，已清除无效字体设置（可能是跨域或字体文件损坏）。';
             }
         }
 
@@ -3910,43 +4370,41 @@
         // ===== 动态/朋友圈功能 =====
         
         // 更换动态背景
-        function changeMomentBg() {
+        async function changeMomentBg() {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
-            input.onchange = function(e) {
+            input.onchange = async function(e) {
                 const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const dataUrl = event.target.result;
-                        localStorage.setItem('moment_bg', dataUrl);
-                        document.getElementById('momentHeaderBg').style.backgroundImage = `url('${dataUrl}')`;
-                        showPhoneAlert('背景已更换');
-                    };
-                    reader.readAsDataURL(file);
+                if (!file) return;
+                try {
+                    const preset = IMAGE_COMPRESS_PRESET.momentBg;
+                    const dataUrl = await compressFileToDataUrl(file, { maxW: preset.maxW, maxH: preset.maxH, quality: preset.quality });
+                    localStorage.setItem('moment_bg', dataUrl);
+                    document.getElementById('momentHeaderBg').style.backgroundImage = `url('${dataUrl}')`;
+                    showPhoneAlert('背景已压缩并更换');
+                } catch (err) {
+                    showPhoneAlert('背景处理失败，请重试');
                 }
             };
             input.click();
         }
         
         // 更换动态头像
-        function changeMomentAvatar() {
+        async function changeMomentAvatar() {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
-            input.onchange = function(e) {
+            input.onchange = async function(e) {
                 const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const dataUrl = event.target.result;
-                        localStorage.setItem('moment_avatar', dataUrl);
-                        document.getElementById('momentAvatar').style.backgroundImage = `url('${dataUrl}')`;
-                        showPhoneAlert('头像已更换');
-                    };
-                    reader.readAsDataURL(file);
-                }
+                if (!file) return;
+                try {
+                    const preset = IMAGE_COMPRESS_PRESET.avatar;
+                    const dataUrl = await compressFileToDataUrl(file, { maxW: preset.maxW, maxH: preset.maxH, quality: preset.quality });
+                    localStorage.setItem('moment_avatar', dataUrl);
+                    document.getElementById('momentAvatar').style.backgroundImage = `url('${dataUrl}')`;
+                    showPhoneAlert('头像已压缩并更换');
+                } catch (err) { showPhoneAlert('头像处理失败，请重试'); }
             };
             input.click();
         }
